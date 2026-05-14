@@ -1,0 +1,1205 @@
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foto Outlet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>(function(){if(!sessionStorage.getItem('sf_user'))window.location.replace('https://www.startfranchise.id/dashboard');})()</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --sf-primary: #099dff;
+      --sf-primary-hover: #0080D6;
+      --sf-accent: #b2de25;
+      --sf-accent-dark: #3D6B00;
+      --sf-bg: #F4F8FF;
+      --sf-card: #FFFFFF;
+      --sf-text: #0A1F3D;
+      --sf-text-muted: #6B7280;
+      --sf-border: rgba(9, 157, 255, 0.15);
+      --sf-border-solid: #D6ECFF;
+      --sf-skeleton: #E8F4FF;
+      --sf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --sf-transition: all 0.2s ease;
+    }
+
+    .sf-layout *, .sf-layout *::before, .sf-layout *::after {
+      box-sizing: border-box !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sf-layout {
+      display: flex !important;
+      min-height: 100vh !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      color: #0A1F3D !important;
+      background: #F4F8FF !important;
+    }
+
+    /* Sidebar */
+    .sf-sidebar {
+      width: 232px; flex-shrink: 0; background: var(--sf-card);
+      border-right: 1px solid var(--sf-border-solid); display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 100;
+      transition: transform 0.25s ease;
+    }
+
+    .sf-sidebar-brand {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 16px 16px; border-bottom: 1px solid var(--sf-border-solid);
+    }
+
+    .sf-sidebar-logo { display: flex; align-items: center; gap: 8px; }
+
+    .sf-sidebar-logo-dot {
+      width: 28px; height: 28px; border-radius: 7px; background: var(--sf-primary);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    .sf-sidebar-title { font-size: 13px; font-weight: 700; color: var(--sf-text); line-height: 1.2; }
+    .sf-sidebar-title small { display: block; font-size: 10.5px; font-weight: 500; color: var(--sf-text-muted); }
+
+    .sf-sidebar-close {
+      display: none; background: none; border: none; cursor: pointer;
+      color: var(--sf-text-muted); font-size: 18px; padding: 4px; line-height: 1;
+    }
+
+    .sf-nav { padding: 12px 8px; flex: 1; }
+    .sf-nav-group { margin-bottom: 20px; }
+
+    .sf-nav-group-label {
+      padding: 4px 8px 8px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em; color: var(--sf-text-muted);
+    }
+
+    .sf-layout .sf-nav-item {
+      display: flex !important; align-items: center !important; gap: 9px !important;
+      padding: 9px 10px !important; border-radius: 8px !important; font-size: 13.5px !important;
+      font-weight: 500 !important; color: #6B7280 !important; text-decoration: none !important;
+      transition: var(--sf-transition) !important; cursor: pointer !important;
+      margin-bottom: 2px !important; background: transparent !important;
+    }
+
+    .sf-layout .sf-nav-item:hover { background: #F4F8FF !important; color: #0A1F3D !important; }
+
+    .sf-layout .sf-nav-item.sf-nav-active {
+      background: rgba(9, 157, 255, 0.1) !important; color: #099dff !important; font-weight: 600 !important;
+    }
+
+    .sf-layout .sf-nav-item svg { flex-shrink: 0 !important; opacity: 0.7 !important; }
+    .sf-layout .sf-nav-item.sf-nav-active svg { opacity: 1 !important; }
+
+    /* Main */
+    .sf-main { flex: 1; min-width: 0; }
+    .sf-wrapper { max-width: 100%; padding: 28px 24px; }
+
+    /* Header */
+    .sf-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
+    }
+
+    .sf-header h1 { font-size: 22px; font-weight: 700; color: var(--sf-text); }
+    .sf-header h1 span { color: var(--sf-primary); }
+    .sf-header-left { display: flex; align-items: center; gap: 12px; }
+    .sf-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    /* Select */
+    .sf-layout .sf-select {
+      padding: 10px 32px 10px 12px !important;
+      border: 1px solid #D6ECFF !important; border-radius: 8px !important;
+      font-family: var(--sf-font) !important; font-size: 13.5px !important; color: #0A1F3D !important;
+      background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center !important;
+      appearance: none !important; -webkit-appearance: none !important;
+      cursor: pointer !important; outline: none !important; transition: var(--sf-transition) !important;
+      min-width: 180px;
+    }
+
+    .sf-layout .sf-select:focus { border-color: #099dff !important; box-shadow: 0 0 0 3px rgba(9,157,255,0.12) !important; }
+
+    /* Card */
+    .sf-card {
+      background: var(--sf-card); border: 1px solid var(--sf-border-solid);
+      border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(9,157,255,0.06);
+    }
+
+    .sf-table-wrap { overflow-x: auto; }
+
+    .sf-layout table {
+      width: 100%; border-collapse: collapse !important;
+      font-size: 13.5px; font-family: var(--sf-font) !important;
+    }
+
+    .sf-layout thead { background: var(--sf-bg) !important; border-bottom: 1px solid var(--sf-border-solid) !important; }
+
+    .sf-layout th {
+      padding: 12px 16px !important; text-align: left !important; font-weight: 600 !important;
+      color: var(--sf-text-muted) !important; font-size: 12px !important;
+      text-transform: uppercase !important; letter-spacing: 0.04em !important; white-space: nowrap !important;
+    }
+
+    .sf-layout td {
+      padding: 12px 16px !important; border-bottom: 1px solid var(--sf-border) !important; vertical-align: middle !important;
+    }
+
+    .sf-layout tbody tr:last-child td { border-bottom: none !important; }
+    .sf-layout tbody tr:hover { background: rgba(9,157,255,0.03) !important; }
+    .sf-layout tr.sf-editing { background: rgba(9,157,255,0.04) !important; }
+    .sf-layout tr.sf-editing td { border-bottom: 1px solid var(--sf-border-solid) !important; }
+
+    /* Thumbnail */
+    .sf-thumb {
+      width: 72px; height: 52px; border-radius: 8px; object-fit: cover;
+      border: 1px solid var(--sf-border-solid); background: var(--sf-skeleton);
+      display: block; cursor: pointer; transition: var(--sf-transition);
+    }
+
+    .sf-thumb:hover { opacity: 0.85; }
+
+    .sf-thumb-placeholder {
+      width: 72px; height: 52px; border-radius: 8px;
+      background: var(--sf-skeleton); border: 1px solid var(--sf-border-solid);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* URL cell */
+    .sf-url-text {
+      font-size: 12px; color: var(--sf-text-muted);
+      max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: block;
+    }
+
+    /* Merchant badge */
+    .sf-merchant-tag {
+      display: inline-flex; align-items: center;
+      padding: 4px 10px; border-radius: 6px;
+      background: rgba(9, 157, 255, 0.08); color: #099dff;
+      font-size: 12.5px; font-weight: 500; white-space: nowrap;
+      max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Inline inputs */
+    .sf-layout .sf-inline-input {
+      padding: 7px 10px !important; border: 1px solid var(--sf-border-solid) !important;
+      border-radius: 7px !important; font-family: var(--sf-font) !important;
+      font-size: 13px !important; color: #0A1F3D !important; background: #ffffff !important;
+      outline: none !important; transition: var(--sf-transition) !important;
+    }
+
+    .sf-layout .sf-inline-input:focus { border-color: #099dff !important; box-shadow: 0 0 0 3px rgba(9,157,255,0.12) !important; }
+
+    /* Buttons */
+    .sf-layout .sf-btn {
+      display: inline-flex !important; align-items: center !important; gap: 4px !important;
+      padding: 6px 11px !important; border-radius: 6px !important; font-family: var(--sf-font) !important;
+      font-size: 12px !important; font-weight: 500 !important; cursor: pointer !important;
+      text-decoration: none !important; border: none !important; transition: var(--sf-transition) !important;
+      white-space: nowrap !important; line-height: 1.4 !important;
+    }
+
+    .sf-layout .sf-btn-primary {
+      background: #099dff !important; color: #ffffff !important;
+      padding: 8px 16px !important; font-size: 13px !important;
+    }
+
+    .sf-layout .sf-btn-primary:hover { background: #0080D6 !important; color: #ffffff !important; }
+    .sf-layout .sf-btn-edit { background: rgba(178,222,37,0.2) !important; color: #3D6B00 !important; }
+    .sf-layout .sf-btn-edit:hover { background: rgba(178,222,37,0.35) !important; color: #3D6B00 !important; }
+    .sf-layout .sf-btn-hapus { background: rgba(255,107,43,0.1) !important; color: #FF6B2B !important; }
+    .sf-layout .sf-btn-hapus:hover { background: rgba(255,107,43,0.2) !important; color: #FF6B2B !important; }
+    .sf-layout .sf-btn-ghost { background: transparent !important; color: #6B7280 !important; border: 1px solid #D6ECFF !important; }
+    .sf-layout .sf-btn-ghost:hover { background: #F4F8FF !important; color: #0A1F3D !important; }
+    .sf-layout .sf-btn-save { background: #099dff !important; color: #ffffff !important; }
+    .sf-layout .sf-btn-save:hover { background: #0080D6 !important; color: #ffffff !important; }
+
+    .sf-actions { display: flex; gap: 6px; align-items: center; }
+
+    /* Add form panel */
+    .sf-add-panel {
+      border-top: 1px solid var(--sf-border-solid);
+      background: rgba(9, 157, 255, 0.02);
+      padding: 16px 20px 20px;
+    }
+
+    .sf-add-panel-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--sf-text-muted); margin-bottom: 14px;
+    }
+
+    .sf-add-form-row {
+      display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+
+    .sf-add-field { display: flex; flex-direction: column; gap: 5px; }
+
+    .sf-add-field label {
+      font-size: 11px; font-weight: 600; color: var(--sf-text-muted);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+
+    .sf-add-field .sf-select { min-width: 200px; padding: 8px 32px 8px 10px !important; font-size: 13.5px !important; }
+
+    /* Drop zone */
+    .sf-dropzone {
+      border: 2px dashed #D6ECFF;
+      border-radius: 10px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--sf-transition);
+      background: #ffffff;
+    }
+
+    .sf-dropzone:hover, .sf-dropzone.sf-drag-over {
+      border-color: #099dff;
+      background: rgba(9,157,255,0.04);
+    }
+
+    .sf-dropzone-icon { font-size: 28px; margin-bottom: 6px; }
+
+    .sf-dropzone-text {
+      font-size: 13.5px; font-weight: 500; color: var(--sf-text); margin-bottom: 2px;
+    }
+
+    .sf-dropzone-hint { font-size: 12px; color: var(--sf-text-muted); }
+
+    .sf-dropzone-hint span {
+      color: #099dff; font-weight: 600; cursor: pointer;
+    }
+
+    /* Selected files preview */
+    .sf-file-preview {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;
+    }
+
+    .sf-file-item {
+      position: relative; width: 80px;
+    }
+
+    .sf-file-thumb {
+      width: 80px; height: 60px; border-radius: 8px; object-fit: cover;
+      border: 1px solid var(--sf-border-solid); display: block;
+    }
+
+    .sf-file-name {
+      font-size: 10px; color: var(--sf-text-muted); margin-top: 3px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;
+    }
+
+    .sf-file-remove {
+      position: absolute; top: -6px; right: -6px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #FF6B2B; color: #fff; border: none;
+      font-size: 10px; cursor: pointer; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Progress bar */
+    .sf-progress-wrap {
+      margin-top: 12px;
+      display: none;
+    }
+
+    .sf-progress-wrap.sf-visible { display: block; }
+
+    .sf-progress-label {
+      font-size: 12px; color: var(--sf-text-muted); margin-bottom: 5px;
+    }
+
+    .sf-progress-bar {
+      height: 6px; border-radius: 99px;
+      background: var(--sf-skeleton); overflow: hidden;
+    }
+
+    .sf-progress-fill {
+      height: 100%; border-radius: 99px; background: #099dff;
+      width: 0%; transition: width 0.2s ease;
+    }
+
+    /* Edit file input area */
+    .sf-edit-file-area {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+
+    .sf-edit-current-thumb {
+      width: 64px; height: 48px; border-radius: 7px; object-fit: cover;
+      border: 1px solid var(--sf-border-solid); flex-shrink: 0;
+    }
+
+    .sf-edit-file-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 12px; border-radius: 7px; border: 1px dashed #D6ECFF;
+      font-size: 12.5px; font-weight: 500; color: #6B7280;
+      cursor: pointer; transition: var(--sf-transition); background: #fff;
+    }
+
+    .sf-edit-file-label:hover { border-color: #099dff; color: #099dff; }
+
+    .sf-edit-file-name {
+      font-size: 12px; color: var(--sf-text-muted); margin-top: 3px;
+    }
+
+    /* Summary */
+    .sf-summary {
+      padding: 10px 16px; font-size: 13px;
+      color: var(--sf-text-muted); border-top: 1px solid var(--sf-border-solid);
+    }
+
+    /* Pagination */
+    .sf-pagination {
+      display: flex; align-items: center; justify-content: center;
+      gap: 4px; padding: 14px 16px; border-top: 1px solid var(--sf-border-solid); flex-wrap: wrap;
+    }
+
+    .sf-layout .sf-page-btn {
+      display: inline-flex !important; align-items: center !important; justify-content: center !important;
+      min-width: 34px !important; height: 34px !important; padding: 0 8px !important;
+      border-radius: 7px !important; font-family: var(--sf-font) !important; font-size: 13px !important;
+      font-weight: 500 !important; cursor: pointer !important; border: 1px solid #D6ECFF !important;
+      background: #ffffff !important; color: #0A1F3D !important; transition: var(--sf-transition) !important;
+      text-decoration: none !important; line-height: 1 !important;
+    }
+
+    .sf-layout .sf-page-btn:hover:not(:disabled):not(.sf-page-active) { border-color: #099dff !important; color: #099dff !important; }
+    .sf-layout .sf-page-btn.sf-page-active { background: #099dff !important; border-color: #099dff !important; color: #ffffff !important; cursor: default !important; }
+    .sf-layout .sf-page-btn:disabled { opacity: 0.4 !important; cursor: not-allowed !important; }
+
+    .sf-page-ellipsis {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; font-size: 13px; color: #6B7280;
+    }
+
+    /* Skeleton */
+    .sf-skeleton-block {
+      height: 14px; border-radius: 6px; background: var(--sf-skeleton);
+      animation: sf-shimmer 1.4s infinite linear; background-size: 400% 100%;
+      background-image: linear-gradient(90deg, var(--sf-skeleton) 0%, #daeeff 40%, var(--sf-skeleton) 60%);
+    }
+
+    .sf-skeleton-img {
+      width: 72px; height: 52px; border-radius: 8px; background: var(--sf-skeleton);
+      animation: sf-shimmer 1.4s infinite linear; background-size: 400% 100%;
+      background-image: linear-gradient(90deg, var(--sf-skeleton) 0%, #daeeff 40%, var(--sf-skeleton) 60%);
+    }
+
+    @keyframes sf-shimmer {
+      0% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* States */
+    .sf-state { padding: 48px 24px; text-align: center; }
+    .sf-state-icon { font-size: 36px; margin-bottom: 12px; }
+    .sf-state h3 { font-size: 16px; font-weight: 600; color: var(--sf-text); margin-bottom: 6px; }
+    .sf-state p { font-size: 14px; color: var(--sf-text-muted); }
+    .sf-state-error h3 { color: #FF6B2B; }
+
+    /* Toast */
+    .sf-toast {
+      position: fixed; bottom: 24px; right: 24px; padding: 12px 18px;
+      border-radius: 10px; font-family: var(--sf-font); font-size: 13.5px; font-weight: 500;
+      color: #fff; z-index: 9999; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      opacity: 1; transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .sf-toast.sf-toast-success { background: #099dff; }
+    .sf-toast.sf-toast-error { background: #FF6B2B; }
+    .sf-toast.sf-toast-hide { opacity: 0; transform: translateY(8px); }
+
+    /* Delete modal */
+    .sf-modal-backdrop {
+      display: none; position: fixed; inset: 0; pointer-events: none;
+      background: rgba(10,31,61,0.4); z-index: 200; align-items: center; justify-content: center;
+    }
+
+    .sf-modal-backdrop.sf-open { display: flex; pointer-events: auto; }
+
+    .sf-modal {
+      background: #ffffff; border-radius: 14px; padding: 28px;
+      max-width: 380px; width: 90%; box-shadow: 0 8px 32px rgba(9,157,255,0.15); font-family: var(--sf-font);
+    }
+
+    .sf-modal-icon { font-size: 36px; margin-bottom: 12px; text-align: center; }
+    .sf-modal h3 { font-size: 17px; font-weight: 700; color: #0A1F3D; margin-bottom: 8px; text-align: center; }
+    .sf-modal p { font-size: 13.5px; color: #6B7280; margin-bottom: 20px; text-align: center; line-height: 1.6; }
+    .sf-modal-actions { display: flex; gap: 8px; justify-content: center; }
+
+    /* Lightbox */
+    .sf-lightbox {
+      display: none; position: fixed; inset: 0; pointer-events: none;
+      background: rgba(10,31,61,0.85); z-index: 300; align-items: center; justify-content: center;
+      cursor: zoom-out;
+    }
+
+    .sf-lightbox.sf-open { display: flex; pointer-events: auto; }
+
+    .sf-lightbox img {
+      max-width: 90vw; max-height: 85vh; border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4); object-fit: contain;
+    }
+
+    .sf-lightbox-close {
+      position: absolute; top: 20px; right: 24px;
+      background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+      width: 38px; height: 38px; cursor: pointer; color: #fff; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+    }
+
+    .sf-lightbox-close:hover { background: rgba(255,255,255,0.25); }
+
+    /* Hamburger */
+    .sf-hamburger {
+      display: none; background: none; border: 1px solid var(--sf-border-solid);
+      border-radius: 7px; padding: 7px 9px; cursor: pointer; color: var(--sf-text);
+      font-size: 16px; line-height: 1; transition: var(--sf-transition);
+    }
+
+    .sf-hamburger:hover { border-color: var(--sf-primary); color: var(--sf-primary); }
+
+    .sf-overlay {
+      display: none; position: fixed; inset: 0; pointer-events: none;
+      background: rgba(10,31,61,0.35); z-index: 99;
+    }
+
+    @media (max-width: 768px) {
+      .sf-sidebar { position: fixed; left: 0; top: 0; height: 100vh; transform: translateX(-100%); }
+      .sf-sidebar.sf-open { transform: translateX(0); box-shadow: 4px 0 24px rgba(9,157,255,0.12); }
+      .sf-overlay.sf-open { display: block; pointer-events: auto; }
+      .sf-sidebar-close { display: block; }
+      .sf-hamburger { display: flex; }
+      .sf-header { flex-direction: column; align-items: flex-start; }
+      .sf-header-right { width: 100%; }
+      .sf-layout .sf-select { min-width: 100%; }
+      .sf-url-text { max-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sf-layout">
+
+    <!-- Sidebar -->
+    <aside class="sf-sidebar" id="sf-sidebar">
+      <div class="sf-sidebar-brand">
+        <div class="sf-sidebar-logo">
+          <div class="sf-sidebar-logo-dot">
+            <svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div class="sf-sidebar-title">
+            Admin Panel
+            <small>start-franchise.com</small>
+          </div>
+        </div>
+        <button class="sf-sidebar-close" onclick="toggleSidebar()">&#10005;</button>
+      </div>
+
+      <nav class="sf-nav">
+        <div class="sf-nav-group">
+          <div class="sf-nav-group-label">Master Data</div>
+
+          <a class="sf-nav-item" href="merchant-dashboard">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            Merchant
+          </a>
+
+          <a class="sf-nav-item" href="franchise-categories">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+            Kategori
+          </a>
+
+          <a class="sf-nav-item" href="franchise-model">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/>
+            </svg>
+            Franchise Model
+          </a>
+
+          <a class="sf-nav-item" href="franchise-system">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Franchise System
+          </a>
+
+          <a class="sf-nav-item" href="franchise-outlet-type">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            </svg>
+            Tipe Outlet
+          </a>
+        </div>
+
+        <div class="sf-nav-group">
+          <div class="sf-nav-group-label">Relasi Merchant</div>
+
+          <a class="sf-nav-item" href="franchise-support">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+            Support Merchant
+          </a>
+
+          <a class="sf-nav-item" href="franchise-keunggulan">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            Keunggulan
+          </a>
+
+          <a class="sf-nav-item sf-nav-active" href="franchise-image-outlet">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+            Foto Outlet
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Mobile overlay -->
+    <div class="sf-overlay" id="sf-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main -->
+    <div class="sf-main">
+      <div class="sf-wrapper">
+        <div class="sf-header">
+          <div class="sf-header-left">
+            <button class="sf-hamburger" onclick="toggleSidebar()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+            <h1>Foto <span>Outlet</span></h1>
+          </div>
+          <div class="sf-header-right">
+            <select class="sf-select" id="sf-filter-merchant" onchange="onFilterChange()">
+              <option value="">Semua Merchant</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sf-card">
+          <div class="sf-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60px">ID</th>
+                  <th style="width:96px">Preview</th>
+                  <th style="width:220px">Merchant</th>
+                  <th>Nama File</th>
+                  <th style="width:160px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="sf-tbody">
+                <tr class="sf-skeleton-row">
+                  <td><div class="sf-skeleton-block" style="width:30px"></div></td>
+                  <td><div class="sf-skeleton-img"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:140px"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:200px"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+                </tr>
+                <tr class="sf-skeleton-row">
+                  <td><div class="sf-skeleton-block" style="width:30px"></div></td>
+                  <td><div class="sf-skeleton-img"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:160px"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:180px"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+                </tr>
+                <tr class="sf-skeleton-row">
+                  <td><div class="sf-skeleton-block" style="width:30px"></div></td>
+                  <td><div class="sf-skeleton-img"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:220px"></div></td>
+                  <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Add form -->
+          <div class="sf-add-panel">
+            <div class="sf-add-panel-title">Upload Foto Outlet Baru</div>
+
+            <div class="sf-add-form-row">
+              <div class="sf-add-field">
+                <label>Merchant</label>
+                <select class="sf-select" id="sf-add-merchant" style="min-width:200px;padding:8px 32px 8px 10px !important;font-size:13.5px !important">
+                  <option value="">Pilih merchant...</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Hidden file input -->
+            <input type="file" id="sf-file-input" accept="image/*" multiple style="display:none" onchange="onFilesSelected(this.files)" />
+
+            <!-- Drop zone -->
+            <div
+              class="sf-dropzone"
+              id="sf-dropzone"
+              onclick="document.getElementById('sf-file-input').click()"
+              ondragover="onDragOver(event)"
+              ondragleave="onDragLeave(event)"
+              ondrop="onDrop(event)"
+            >
+              <div class="sf-dropzone-icon">&#128247;</div>
+              <div class="sf-dropzone-text">Drag & drop foto di sini</div>
+              <div class="sf-dropzone-hint">atau <span onclick="event.stopPropagation();document.getElementById('sf-file-input').click()">klik untuk pilih file</span> &nbsp;·&nbsp; JPG, PNG, WEBP &nbsp;·&nbsp; Bisa pilih banyak sekaligus</div>
+            </div>
+
+            <!-- Selected files preview -->
+            <div class="sf-file-preview" id="sf-file-preview"></div>
+
+            <!-- Progress -->
+            <div class="sf-progress-wrap" id="sf-progress-wrap">
+              <div class="sf-progress-label" id="sf-progress-label">Mengupload...</div>
+              <div class="sf-progress-bar"><div class="sf-progress-fill" id="sf-progress-fill"></div></div>
+            </div>
+
+            <!-- Upload button -->
+            <div style="margin-top:14px">
+              <button class="sf-btn sf-btn-primary" onclick="uploadFiles()" id="sf-add-btn" style="display:none">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+                </svg>
+                Upload Foto
+              </button>
+            </div>
+          </div>
+
+          <div class="sf-summary" id="sf-summary" style="display:none"></div>
+          <div class="sf-pagination" id="sf-pagination" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete modal -->
+  <div class="sf-modal-backdrop" id="sf-modal" onclick="closeModal(event)">
+    <div class="sf-modal">
+      <div class="sf-modal-icon">&#128465;</div>
+      <h3>Hapus Foto?</h3>
+      <p id="sf-modal-msg">Foto ini akan dihapus permanen dari galeri outlet.</p>
+      <div class="sf-modal-actions">
+        <button class="sf-btn sf-btn-ghost" onclick="document.getElementById('sf-modal').classList.remove('sf-open')">Batal</button>
+        <button class="sf-btn sf-btn-hapus" id="sf-modal-confirm" style="padding:8px 18px !important;font-size:13px !important;">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="sf-lightbox" id="sf-lightbox" onclick="closeLightbox()">
+    <button class="sf-lightbox-close" onclick="closeLightbox()">&#10005;</button>
+    <img id="sf-lightbox-img" src="" alt="Preview foto outlet" />
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sf-sidebar').classList.toggle('sf-open');
+      document.getElementById('sf-overlay').classList.toggle('sf-open');
+    }
+
+    const SUPABASE_URL = 'https://abhfhsnkwdjoixukwsju.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiaGZoc25rd2Rqb2l4dWt3c2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzkxMTYsImV4cCI6MjA4ODc1NTExNn0.LUHW6BsmH8i4oKEfvJoCIRNhFn6Vj2EosjcrVQZTVfg';
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const BUCKET = 'Start Franchise Bucket';
+
+    const PAGE_SIZE = 20;
+    let currentPage = 1;
+    let totalCount = 0;
+    let filterMerchantId = '';
+    let editingId = null;
+    let merchantMap = {};
+    let selectedFiles = [];
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg, type = 'success') {
+      const existing = document.querySelector('.sf-toast');
+      if (existing) existing.remove();
+      const t = document.createElement('div');
+      t.className = `sf-toast sf-toast-${type}`;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.classList.add('sf-toast-hide'), 2200);
+      setTimeout(() => t.remove(), 2600);
+    }
+
+    function openLightbox(src) {
+      document.getElementById('sf-lightbox-img').src = src;
+      document.getElementById('sf-lightbox').classList.add('sf-open');
+    }
+
+    function closeLightbox() {
+      document.getElementById('sf-lightbox').classList.remove('sf-open');
+      document.getElementById('sf-lightbox-img').src = '';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    /* ── Drop zone ── */
+    function onDragOver(e) {
+      e.preventDefault();
+      document.getElementById('sf-dropzone').classList.add('sf-drag-over');
+    }
+
+    function onDragLeave(e) {
+      document.getElementById('sf-dropzone').classList.remove('sf-drag-over');
+    }
+
+    function onDrop(e) {
+      e.preventDefault();
+      document.getElementById('sf-dropzone').classList.remove('sf-drag-over');
+      onFilesSelected(e.dataTransfer.files);
+    }
+
+    function onFilesSelected(fileList) {
+      const imageFiles = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+      if (!imageFiles.length) { showToast('Pilih file gambar (JPG, PNG, WEBP)', 'error'); return; }
+
+      selectedFiles = [...selectedFiles, ...imageFiles];
+      renderFilePreview();
+      document.getElementById('sf-add-btn').style.display = 'inline-flex';
+      document.getElementById('sf-file-input').value = '';
+    }
+
+    function removeFile(idx) {
+      selectedFiles.splice(idx, 1);
+      renderFilePreview();
+      if (!selectedFiles.length) document.getElementById('sf-add-btn').style.display = 'none';
+    }
+
+    function renderFilePreview() {
+      const wrap = document.getElementById('sf-file-preview');
+      wrap.innerHTML = selectedFiles.map((f, i) => {
+        const blobUrl = URL.createObjectURL(f);
+        return `
+          <div class="sf-file-item">
+            <button class="sf-file-remove" onclick="removeFile(${i})" title="Hapus">&#10005;</button>
+            <img class="sf-file-thumb" src="${blobUrl}" alt="${escHtml(f.name)}" />
+            <div class="sf-file-name">${escHtml(f.name)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function setProgress(pct, label) {
+      const wrap = document.getElementById('sf-progress-wrap');
+      wrap.classList.toggle('sf-visible', pct >= 0 && pct <= 100);
+      document.getElementById('sf-progress-fill').style.width = pct + '%';
+      document.getElementById('sf-progress-label').textContent = label || 'Mengupload...';
+    }
+
+    /* ── Storage upload ── */
+    function sanitizeFilename(name) {
+      return name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    }
+
+    async function uploadToStorage(file, merchantId) {
+      const ext = file.name.split('.').pop();
+      const safeName = sanitizeFilename(file.name.replace(/\.[^.]+$/, ''));
+      const path = `outlets/${merchantId}/${Date.now()}_${safeName}.${ext}`;
+
+      const { error } = await client.storage
+        .from(BUCKET)
+        .upload(path, file, { upsert: false, contentType: file.type });
+
+      if (error) throw new Error(error.message);
+
+      const { data } = client.storage.from(BUCKET).getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    /* ── Upload multiple files ── */
+    async function uploadFiles() {
+      const merchantSel = document.getElementById('sf-add-merchant');
+      const merchant_id = merchantSel.value;
+
+      if (!merchant_id) { merchantSel.focus(); showToast('Pilih merchant terlebih dahulu', 'error'); return; }
+      if (!selectedFiles.length) { showToast('Pilih minimal satu foto', 'error'); return; }
+
+      const btn = document.getElementById('sf-add-btn');
+      btn.disabled = true;
+      setProgress(0, `Mengupload 0 / ${selectedFiles.length} foto...`);
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        setProgress(Math.round((i / selectedFiles.length) * 100), `Mengupload ${i + 1} / ${selectedFiles.length}: ${file.name}`);
+
+        try {
+          const publicUrl = await uploadToStorage(file, merchant_id);
+
+          const { error: dbErr } = await client
+            .from('franchise_image_outlet')
+            .insert({ merchant_id: parseInt(merchant_id), image_url: publicUrl });
+
+          if (dbErr) throw new Error(dbErr.message);
+          successCount++;
+        } catch (err) {
+          failCount++;
+          console.error(`Gagal upload ${file.name}:`, err.message);
+        }
+      }
+
+      setProgress(100, 'Selesai!');
+      setTimeout(() => setProgress(-1), 1200);
+
+      btn.disabled = false;
+
+      selectedFiles = [];
+      renderFilePreview();
+      btn.style.display = 'none';
+      document.getElementById('sf-file-input').value = '';
+
+      if (failCount === 0) {
+        showToast(`${successCount} foto berhasil diupload`);
+      } else {
+        showToast(`${successCount} berhasil, ${failCount} gagal`, failCount === successCount ? 'error' : 'success');
+      }
+
+      await loadItems(currentPage);
+    }
+
+    /* ── Skeleton ── */
+    function showSkeleton() {
+      document.getElementById('sf-tbody').innerHTML = `
+        <tr class="sf-skeleton-row">
+          <td><div class="sf-skeleton-block" style="width:30px"></div></td>
+          <td><div class="sf-skeleton-img"></div></td>
+          <td><div class="sf-skeleton-block" style="width:140px"></div></td>
+          <td><div class="sf-skeleton-block" style="width:200px"></div></td>
+          <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+        </tr>
+        <tr class="sf-skeleton-row">
+          <td><div class="sf-skeleton-block" style="width:30px"></div></td>
+          <td><div class="sf-skeleton-img"></div></td>
+          <td><div class="sf-skeleton-block" style="width:160px"></div></td>
+          <td><div class="sf-skeleton-block" style="width:180px"></div></td>
+          <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+        </tr>
+        <tr class="sf-skeleton-row">
+          <td><div class="sf-skeleton-block" style="width:30px"></div></td>
+          <td><div class="sf-skeleton-img"></div></td>
+          <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+          <td><div class="sf-skeleton-block" style="width:220px"></div></td>
+          <td><div class="sf-skeleton-block" style="width:120px"></div></td>
+        </tr>`;
+      document.getElementById('sf-summary').style.display = 'none';
+      document.getElementById('sf-pagination').style.display = 'none';
+    }
+
+    async function loadMerchants() {
+      const { data } = await client
+        .from('franchise_merchant')
+        .select('id, nama')
+        .order('nama', { ascending: true });
+
+      if (!data) return;
+
+      merchantMap = {};
+      data.forEach(m => { merchantMap[m.id] = m.nama; });
+
+      const opts = data.map(m => `<option value="${m.id}">${escHtml(m.nama)}</option>`).join('');
+
+      document.getElementById('sf-filter-merchant').innerHTML = `<option value="">Semua Merchant</option>` + opts;
+      document.getElementById('sf-add-merchant').innerHTML = `<option value="">Pilih merchant...</option>` + opts;
+    }
+
+    function filenameFromUrl(url) {
+      if (!url) return '—';
+      try { return decodeURIComponent(url.split('/').pop().split('?')[0]); } catch { return url; }
+    }
+
+    function actionButtons(item) {
+      return `
+        <button class="sf-btn sf-btn-edit" onclick="startEdit(${item.id})">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </button>
+        <button class="sf-btn sf-btn-hapus" onclick="confirmDelete(${item.id})">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+          </svg>
+          Hapus
+        </button>`;
+    }
+
+    function renderRows(items) {
+      const tbody = document.getElementById('sf-tbody');
+
+      if (items.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="5">
+            <div class="sf-state">
+              <div class="sf-state-icon">&#128247;</div>
+              <h3>Belum ada foto outlet</h3>
+              <p>Upload foto outlet menggunakan form di bawah tabel.</p>
+            </div>
+          </td></tr>`;
+        document.getElementById('sf-summary').style.display = 'none';
+        document.getElementById('sf-pagination').style.display = 'none';
+        return;
+      }
+
+      tbody.innerHTML = items.map(item => {
+        const merchantNama = merchantMap[item.merchant_id] || `ID ${item.merchant_id}`;
+        const fname = filenameFromUrl(item.image_url);
+        const imgSrc = escHtml(item.image_url || '');
+        const thumbHtml = item.image_url
+          ? `<img class="sf-thumb" src="${imgSrc}" alt="foto" loading="lazy"
+               onclick="openLightbox('${imgSrc}')"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+             <div class="sf-thumb-placeholder" style="display:none">
+               <svg width="20" height="20" fill="none" stroke="#D6ECFF" stroke-width="2" viewBox="0 0 24 24">
+                 <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+               </svg>
+             </div>`
+          : `<div class="sf-thumb-placeholder">
+               <svg width="20" height="20" fill="none" stroke="#D6ECFF" stroke-width="2" viewBox="0 0 24 24">
+                 <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+               </svg>
+             </div>`;
+
+        return `
+          <tr id="row-${item.id}" data-id="${item.id}" data-url="${imgSrc}" data-merchant="${item.merchant_id}">
+            <td style="color:var(--sf-text-muted);font-size:13px">${item.id}</td>
+            <td id="thumb-cell-${item.id}">${thumbHtml}</td>
+            <td id="merchant-cell-${item.id}">
+              <span class="sf-merchant-tag" title="${escHtml(merchantNama)}">${escHtml(merchantNama)}</span>
+            </td>
+            <td id="url-cell-${item.id}">
+              <span class="sf-url-text" title="${escHtml(item.image_url || '')}">${escHtml(fname)}</span>
+            </td>
+            <td><div class="sf-actions">${actionButtons(item)}</div></td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderSummary(page, rowCount) {
+      const from = (page - 1) * PAGE_SIZE + 1;
+      const to = (page - 1) * PAGE_SIZE + rowCount;
+      const el = document.getElementById('sf-summary');
+      el.textContent = `Menampilkan ${from}–${to} dari ${totalCount} foto`;
+      el.style.display = 'block';
+    }
+
+    function renderPagination(page, totalPages) {
+      const el = document.getElementById('sf-pagination');
+      if (totalPages <= 1) { el.style.display = 'none'; return; }
+
+      const pages = [1];
+      if (page > 4) pages.push('…');
+      for (let p = Math.max(2, page - 2); p <= Math.min(totalPages - 1, page + 2); p++) pages.push(p);
+      if (page < totalPages - 3) pages.push('…');
+      if (totalPages > 1) pages.push(totalPages);
+
+      let html = `<button class="sf-page-btn" onclick="goToPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>&#8592; Prev</button>`;
+      for (const p of pages) {
+        html += p === '…'
+          ? `<span class="sf-page-ellipsis">…</span>`
+          : `<button class="sf-page-btn ${p === page ? 'sf-page-active' : ''}" onclick="goToPage(${p})">${p}</button>`;
+      }
+      html += `<button class="sf-page-btn" onclick="goToPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Next &#8594;</button>`;
+
+      el.innerHTML = html;
+      el.style.display = 'flex';
+    }
+
+    function goToPage(page) {
+      if (page < 1 || page > Math.ceil(totalCount / PAGE_SIZE)) return;
+      loadItems(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function onFilterChange() {
+      filterMerchantId = document.getElementById('sf-filter-merchant').value;
+      loadItems(1);
+    }
+
+    async function loadItems(page = 1) {
+      currentPage = page;
+      showSkeleton();
+
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      let q = client
+        .from('franchise_image_outlet')
+        .select('id, merchant_id, image_url', { count: 'exact' })
+        .order('merchant_id', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, to);
+
+      if (filterMerchantId) q = q.eq('merchant_id', filterMerchantId);
+
+      const { data, count, error } = await q;
+
+      if (error) {
+        document.getElementById('sf-tbody').innerHTML = `
+          <tr><td colspan="5">
+            <div class="sf-state sf-state-error">
+              <div class="sf-state-icon">&#9888;</div>
+              <h3>Gagal memuat data</h3>
+              <p>${escHtml(error.message)}</p>
+            </div>
+          </td></tr>`;
+        return;
+      }
+
+      totalCount = count || 0;
+      const rows = data || [];
+      renderRows(rows);
+      if (rows.length > 0) {
+        renderSummary(page, rows.length);
+        renderPagination(page, Math.ceil(totalCount / PAGE_SIZE));
+      }
+    }
+
+    /* ── Edit ── */
+    function startEdit(id) {
+      if (editingId !== null) cancelEdit();
+      editingId = id;
+
+      const row = document.getElementById(`row-${id}`);
+      const currentUrl = row.dataset.url;
+      const currentMerchant = row.dataset.merchant;
+      row.classList.add('sf-editing');
+
+      const merchantOptions = Object.entries(merchantMap)
+        .map(([mid, mname]) =>
+          `<option value="${mid}" ${mid == currentMerchant ? 'selected' : ''}>${escHtml(mname)}</option>`)
+        .join('');
+
+      document.getElementById(`merchant-cell-${id}`).innerHTML = `
+        <select class="sf-select" id="edit-merchant-${id}"
+          style="min-width:160px;padding:6px 28px 6px 8px !important;font-size:13px !important">
+          ${merchantOptions}
+        </select>`;
+
+      const currentThumbHtml = currentUrl
+        ? `<img class="sf-edit-current-thumb" src="${escHtml(currentUrl)}" alt="current"
+             onerror="this.style.display='none'" />`
+        : '';
+
+      document.getElementById(`thumb-cell-${id}`).innerHTML = '';
+
+      document.getElementById(`url-cell-${id}`).innerHTML = `
+        <div class="sf-edit-file-area">
+          ${currentThumbHtml}
+          <div>
+            <input type="file" id="edit-file-${id}" accept="image/*" style="display:none"
+              onchange="onEditFileSelected(${id}, this)" />
+            <label class="sf-edit-file-label" onclick="document.getElementById('edit-file-${id}').click()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+                <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+              </svg>
+              Ganti Foto
+            </label>
+            <div class="sf-edit-file-name" id="edit-fname-${id}">Biarkan kosong untuk tidak mengganti</div>
+          </div>
+        </div>`;
+
+      row.querySelector('.sf-actions').innerHTML = `
+        <button class="sf-btn sf-btn-save" onclick="saveEdit(${id})">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Simpan
+        </button>
+        <button class="sf-btn sf-btn-ghost" onclick="cancelEdit()">Batal</button>`;
+    }
+
+    function onEditFileSelected(id, input) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById(`edit-fname-${id}`).textContent = file.name;
+    }
+
+    function cancelEdit() {
+      if (editingId === null) return;
+      editingId = null;
+      loadItems(currentPage);
+    }
+
+    async function saveEdit(id) {
+      const merchantSel = document.getElementById(`edit-merchant-${id}`);
+      const fileInput = document.getElementById(`edit-file-${id}`);
+      const merchant_id = parseInt(merchantSel.value);
+
+      merchantSel.disabled = true;
+
+      let image_url = document.getElementById(`row-${id}`).dataset.url || null;
+
+      if (fileInput && fileInput.files[0]) {
+        try {
+          image_url = await uploadToStorage(fileInput.files[0], merchant_id);
+        } catch (err) {
+          merchantSel.disabled = false;
+          showToast('Gagal upload foto: ' + err.message, 'error');
+          return;
+        }
+      }
+
+      const { error } = await client
+        .from('franchise_image_outlet')
+        .update({ image_url, merchant_id })
+        .eq('id', id);
+
+      if (error) {
+        merchantSel.disabled = false;
+        showToast('Gagal menyimpan: ' + error.message, 'error');
+        return;
+      }
+
+      editingId = null;
+      showToast('Foto berhasil diperbarui');
+      await loadItems(currentPage);
+    }
+
+    /* ── Delete ── */
+    function confirmDelete(id) {
+      document.getElementById('sf-modal-msg').textContent = 'Foto ini akan dihapus permanen dari galeri outlet.';
+      document.getElementById('sf-modal-confirm').onclick = () => deleteItem(id);
+      document.getElementById('sf-modal').classList.add('sf-open');
+    }
+
+    function closeModal(e) {
+      if (e.target === document.getElementById('sf-modal')) {
+        document.getElementById('sf-modal').classList.remove('sf-open');
+      }
+    }
+
+    async function deleteItem(id) {
+      document.getElementById('sf-modal').classList.remove('sf-open');
+
+      const { error } = await client
+        .from('franchise_image_outlet')
+        .delete()
+        .eq('id', id);
+
+      if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); return; }
+
+      showToast('Foto berhasil dihapus');
+      await loadItems(currentPage);
+    }
+
+    (async () => {
+      await loadMerchants();
+      await loadItems();
+    })();
+  </script>
+</body>

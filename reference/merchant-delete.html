@@ -1,0 +1,873 @@
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hapus Merchant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>(function(){if(!sessionStorage.getItem('sf_user'))window.location.replace('https://www.startfranchise.id/dashboard');})()</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --sf-primary: #099dff;
+      --sf-primary-hover: #0080D6;
+      --sf-bg: #F2F2F7;
+      --sf-card: #FFFFFF;
+      --sf-text: #0A1F3D;
+      --sf-muted: #6B7280;
+      --sf-border: rgba(60, 60, 67, 0.13);
+      --sf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .sf-layout *,
+    .sf-layout *::before,
+    .sf-layout *::after {
+      box-sizing: border-box !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sf-layout {
+      min-height: 100vh !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      color: #0A1F3D !important;
+      background: #F2F2F7 !important;
+      display: block !important;
+      position: relative !important;
+    }
+
+    /* ── Header ───────────────────────────────────── */
+    .sf-portal-header {
+      background: rgba(255, 255, 255, 0.82) !important;
+      backdrop-filter: saturate(180%) blur(24px) !important;
+      -webkit-backdrop-filter: saturate(180%) blur(24px) !important;
+      border-bottom: 0.5px solid rgba(60, 60, 67, 0.18) !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 100 !important;
+    }
+
+    .sf-layout .sf-portal-header-inner {
+      max-width: 800px !important;
+      width: 100% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      padding: 11px 28px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      gap: 11px !important;
+    }
+
+    .sf-hdr-logo-wrap {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #FF3B30, #C0392B);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(255, 59, 48, 0.32);
+    }
+
+    .sf-hdr-logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sf-hdr-meta h1 {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #0A1F3D !important;
+      letter-spacing: -0.1px !important;
+    }
+
+    .sf-hdr-meta p {
+      font-size: 11px !important;
+      color: #8E8E93 !important;
+      margin-top: 1px !important;
+    }
+
+    /* ── Layout ───────────────────────────────────── */
+    .sf-portal-main {
+      padding-bottom: 80px;
+    }
+
+    .sf-layout .sf-container {
+      max-width: 800px !important;
+      width: 100% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      padding: 30px 28px !important;
+      display: block !important;
+      flex-direction: unset !important;
+      align-items: unset !important;
+      justify-content: unset !important;
+      flex-wrap: unset !important;
+    }
+
+    /* ── Page title ───────────────────────────────── */
+    .sf-page-title {
+      margin-bottom: 26px;
+    }
+
+    .sf-page-title h2 {
+      font-size: 28px !important;
+      font-weight: 700 !important;
+      color: #0A1F3D !important;
+      letter-spacing: -0.6px !important;
+      line-height: 1.15 !important;
+    }
+
+    .sf-page-title p {
+      font-size: 14px !important;
+      color: #6B7280 !important;
+      margin-top: 5px !important;
+    }
+
+    /* ── Section card ─────────────────────────────── */
+    .sf-section {
+      background: #FFFFFF !important;
+      border-radius: 14px !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      margin-bottom: 14px !important;
+    }
+
+    .sf-section-header {
+      padding: 18px 22px 13px !important;
+      border-bottom: 0.5px solid rgba(60, 60, 67, 0.09) !important;
+    }
+
+    .sf-section-header h3 {
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      color: #0A1F3D !important;
+      letter-spacing: -0.1px !important;
+    }
+
+    .sf-section-header p {
+      font-size: 12px !important;
+      color: #6B7280 !important;
+      margin-top: 2px !important;
+      line-height: 1.5 !important;
+    }
+
+    .sf-section-body {
+      padding: 20px 22px !important;
+    }
+
+    .sf-section-footer {
+      padding: 13px 22px !important;
+      background: #FAFAFA !important;
+      border-top: 0.5px solid rgba(60, 60, 67, 0.09) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+
+    /* ── Merchant preview card ────────────────────── */
+    .sf-merchant-preview {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #FAFAFA;
+      border: 1px solid rgba(60, 60, 67, 0.09);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .sf-merchant-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(60, 60, 67, 0.1);
+      background: #F2F2F7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sf-merchant-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .sf-merchant-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sf-merchant-info h4 {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      color: #0A1F3D !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .sf-merchant-info p {
+      font-size: 13px !important;
+      color: #6B7280 !important;
+      margin-top: 3px !important;
+    }
+
+    /* ── Warning box ──────────────────────────────── */
+    .sf-warning-box {
+      background: rgba(255, 59, 48, 0.05);
+      border: 1px solid rgba(255, 59, 48, 0.18);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+
+    .sf-warning-box h4 {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #C0392B !important;
+      margin-bottom: 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+    }
+
+    .sf-warning-box ul {
+      padding-left: 18px !important;
+      margin: 0 !important;
+    }
+
+    .sf-warning-box ul li {
+      font-size: 13px !important;
+      color: #6B7280 !important;
+      margin-bottom: 4px !important;
+      line-height: 1.5 !important;
+    }
+
+    .sf-warning-box ul li:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    /* ── Confirmation input ───────────────────────── */
+    .sf-confirm-label {
+      font-size: 13px !important;
+      color: #0A1F3D !important;
+      margin-bottom: 8px !important;
+      display: block !important;
+      line-height: 1.5 !important;
+    }
+
+    .sf-confirm-label strong {
+      font-weight: 600 !important;
+      color: #FF3B30 !important;
+    }
+
+    .sf-layout .sf-input-confirm {
+      width: 100% !important;
+      border: 1px solid rgba(60, 60, 67, 0.18) !important;
+      border-radius: 8px !important;
+      padding: 9px 12px !important;
+      font-family: 'Inter', -apple-system, sans-serif !important;
+      font-size: 14px !important;
+      color: #0A1F3D !important;
+      background: #FFFFFF !important;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease !important;
+      outline: none !important;
+    }
+
+    .sf-layout .sf-input-confirm:focus {
+      border-color: #FF3B30 !important;
+      box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12) !important;
+    }
+
+    .sf-layout .sf-input-confirm.sf-invalid {
+      border-color: #FF3B30 !important;
+      box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.18) !important;
+    }
+
+    .sf-input-hint {
+      font-size: 11.5px !important;
+      color: #9CA3AF !important;
+      margin-top: 6px !important;
+      display: block !important;
+    }
+
+    /* ── Buttons ──────────────────────────────────── */
+    .sf-layout .sf-btn-danger {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      padding: 10px 20px !important;
+      background: #FF3B30 !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 8px !important;
+      font-family: 'Inter', -apple-system, sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: background 0.14s ease, transform 0.1s ease !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+    }
+
+    .sf-layout .sf-btn-danger:hover {
+      background: #C0392B !important;
+      color: #ffffff !important;
+    }
+
+    .sf-layout .sf-btn-danger:active {
+      transform: scale(0.98) !important;
+    }
+
+    .sf-layout .sf-btn-danger:disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+    }
+
+    .sf-layout .sf-btn-secondary {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      padding: 10px 20px !important;
+      background: rgba(60, 60, 67, 0.07) !important;
+      color: #0A1F3D !important;
+      border: none !important;
+      border-radius: 8px !important;
+      font-family: 'Inter', -apple-system, sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: background 0.14s ease !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+    }
+
+    .sf-layout .sf-btn-secondary:hover {
+      background: rgba(60, 60, 67, 0.12) !important;
+      color: #0A1F3D !important;
+    }
+
+    /* ── Stats row ────────────────────────────────── */
+    .sf-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .sf-stat-card {
+      background: #FAFAFA;
+      border: 1px solid rgba(60, 60, 67, 0.09);
+      border-radius: 10px;
+      padding: 13px 15px;
+      text-align: center;
+    }
+
+    .sf-stat-card .sf-stat-num {
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      color: #0A1F3D !important;
+      line-height: 1 !important;
+    }
+
+    .sf-stat-card .sf-stat-label {
+      font-size: 11px !important;
+      color: #8E8E93 !important;
+      margin-top: 4px !important;
+      font-weight: 500 !important;
+    }
+
+    /* ── Deleted state ────────────────────────────── */
+    .sf-deleted-state {
+      text-align: center;
+      padding: 50px 24px;
+    }
+
+    .sf-deleted-state .sf-deleted-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(52, 199, 89, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .sf-deleted-state h3 {
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      color: #0A1F3D !important;
+      margin-bottom: 8px !important;
+    }
+
+    .sf-deleted-state p {
+      font-size: 14px !important;
+      color: #6B7280 !important;
+      margin-bottom: 20px !important;
+    }
+
+    /* ── Toast ────────────────────────────────────── */
+    .sf-toast {
+      position: fixed !important;
+      bottom: 28px !important;
+      left: 50% !important;
+      transform: translateX(-50%) translateY(80px) !important;
+      background: rgba(28, 28, 30, 0.92) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      color: #fff !important;
+      padding: 11px 18px !important;
+      border-radius: 20px !important;
+      font-size: 13.5px !important;
+      font-weight: 500 !important;
+      z-index: 9999 !important;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+      white-space: nowrap !important;
+      pointer-events: none !important;
+      max-width: 90vw !important;
+      font-family: 'Inter', -apple-system, sans-serif !important;
+    }
+
+    .sf-toast.sf-show {
+      transform: translateX(-50%) translateY(0) !important;
+    }
+
+    .sf-toast.sf-toast-error {
+      background: rgba(255, 59, 48, 0.92) !important;
+    }
+
+    /* ── Skeleton ─────────────────────────────────── */
+    .sf-skel {
+      background: linear-gradient(90deg, #EBEBF0 0%, #E1E1EA 40%, #EBEBF0 60%);
+      background-size: 400% 100%;
+      animation: sf-shimmer 1.5s infinite linear;
+      border-radius: 8px;
+    }
+
+    @keyframes sf-shimmer {
+      0% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ── Error state ──────────────────────────────── */
+    .sf-error-state {
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .sf-error-state h2 {
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      color: #FF3B30 !important;
+      margin: 14px 0 7px !important;
+    }
+
+    .sf-error-state p {
+      font-size: 14px !important;
+      color: #6B7280 !important;
+    }
+
+    /* ── Responsive ───────────────────────────────── */
+    @media (max-width: 600px) {
+      .sf-container {
+        padding: 16px 14px;
+      }
+
+      .sf-section-header {
+        padding: 15px 18px 11px !important;
+      }
+
+      .sf-section-body {
+        padding: 16px 18px !important;
+      }
+
+      .sf-section-footer {
+        padding: 12px 18px !important;
+        flex-wrap: wrap !important;
+      }
+
+      .sf-stats-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+      }
+
+      .sf-page-title h2 {
+        font-size: 22px !important;
+      }
+    }
+  </style>
+
+
+  <div class="sf-layout">
+
+    <!-- Header -->
+    <header class="sf-portal-header">
+      <div class="sf-portal-header-inner">
+        <div class="sf-hdr-logo-wrap" id="sf-hdr-logo">
+          <svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4h6v2" />
+          </svg>
+        </div>
+        <div class="sf-hdr-meta">
+          <h1 id="sf-hdr-name">Memuat data...</h1>
+          <p>Admin Panel — Hapus Merchant</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast -->
+    <div class="sf-toast" id="sf-toast"></div>
+
+    <!-- Main -->
+    <main class="sf-portal-main">
+      <div class="sf-container">
+
+        <!-- Loading skeleton -->
+        <div id="sf-loading">
+          <div class="sf-page-title">
+            <div class="sf-skel" style="width:200px;height:26px;margin-bottom:9px;border-radius:8px"></div>
+            <div class="sf-skel" style="width:290px;height:13px;border-radius:6px"></div>
+          </div>
+          <div class="sf-section">
+            <div class="sf-section-header">
+              <div class="sf-skel" style="width:150px;height:15px;border-radius:6px"></div>
+            </div>
+            <div class="sf-section-body">
+              <div class="sf-skel" style="height:80px;border-radius:12px;margin-bottom:16px"></div>
+              <div class="sf-skel" style="height:60px;border-radius:10px;margin-bottom:16px"></div>
+              <div class="sf-skel" style="height:56px;border-radius:8px;margin-bottom:10px"></div>
+              <div class="sf-skel" style="height:13px;width:200px;border-radius:6px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div id="sf-error" style="display:none">
+          <div class="sf-error-state">
+            <svg width="48" height="48" fill="none" stroke="#FF3B30" stroke-width="1.5" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <circle cx="12" cy="16" r="0.5" fill="#FF3B30" />
+            </svg>
+            <h2>Merchant Tidak Ditemukan</h2>
+            <p id="sf-error-msg">ID merchant tidak valid atau data tidak ditemukan.</p>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div id="sf-content" style="display:none">
+
+          <div class="sf-page-title">
+            <h2>Hapus Merchant</h2>
+            <p>Tindakan ini bersifat permanen dan tidak dapat dibatalkan</p>
+          </div>
+
+          <!-- Section: Konfirmasi Hapus -->
+          <section class="sf-section">
+            <div class="sf-section-header">
+              <h3>Konfirmasi Penghapusan</h3>
+              <p>Pastikan Anda memilih merchant yang tepat sebelum melanjutkan</p>
+            </div>
+            <div class="sf-section-body">
+
+              <!-- Merchant preview -->
+              <div class="sf-merchant-preview">
+                <div class="sf-merchant-thumb" id="sf-thumb-box">
+                  <svg width="24" height="24" fill="none" stroke="#C7C7CC" stroke-width="1.5" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="3" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                </div>
+                <div class="sf-merchant-info">
+                  <h4 id="sf-merchant-name">—</h4>
+                  <p id="sf-merchant-meta">—</p>
+                </div>
+              </div>
+
+              <!-- Data summary -->
+              <div class="sf-stats-row" id="sf-stats-row">
+                <div class="sf-stat-card">
+                  <div class="sf-stat-num" id="stat-support">—</div>
+                  <div class="sf-stat-label">Support</div>
+                </div>
+                <div class="sf-stat-card">
+                  <div class="sf-stat-num" id="stat-keunggulan">—</div>
+                  <div class="sf-stat-label">Keunggulan</div>
+                </div>
+                <div class="sf-stat-card">
+                  <div class="sf-stat-num" id="stat-photos">—</div>
+                  <div class="sf-stat-label">Foto Outlet</div>
+                </div>
+              </div>
+
+              <!-- Warning -->
+              <div class="sf-warning-box">
+                <h4>
+                  <svg width="15" height="15" fill="none" stroke="#C0392B" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  Data yang akan dihapus secara permanen:
+                </h4>
+                <ul>
+                  <li>Profil utama merchant (nama, harga, deskripsi, gambar, dll.)</li>
+                  <li>Semua item Support Merchant yang terkait</li>
+                  <li>Semua item Keunggulan Merchant yang terkait</li>
+                  <li>Semua Foto Outlet yang terkait</li>
+                </ul>
+              </div>
+
+              <!-- Confirmation input -->
+              <label class="sf-confirm-label" for="inp-confirm">
+                Ketik nama merchant <strong id="sf-confirm-name-hint">—</strong> untuk mengkonfirmasi penghapusan:
+              </label>
+              <input
+                class="sf-input-confirm"
+                id="inp-confirm"
+                type="text"
+                placeholder="Ketik nama merchant di sini..."
+                oninput="onConfirmInput()"
+                onpaste="setTimeout(onConfirmInput, 0)"
+              />
+              <span class="sf-input-hint">Nama harus sama persis (huruf besar/kecil tidak dibedakan)</span>
+
+            </div>
+            <div class="sf-section-footer">
+              <button class="sf-btn-danger" id="btn-delete" onclick="deleteMerchant()" disabled>
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4h6v2" />
+                </svg>
+                Hapus Merchant
+              </button>
+              <button class="sf-btn-secondary" onclick="history.back()">
+                Batal
+              </button>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Deleted state -->
+        <div id="sf-deleted" style="display:none">
+          <div class="sf-section">
+            <div class="sf-section-body">
+              <div class="sf-deleted-state">
+                <div class="sf-deleted-icon">
+                  <svg width="28" height="28" fill="none" stroke="#34C759" stroke-width="2.5" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <h3>Merchant Berhasil Dihapus</h3>
+                <p id="sf-deleted-msg">Data merchant telah dihapus secara permanen dari sistem.</p>
+                <button class="sf-btn-secondary" onclick="goToDashboard()">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Kembali ke Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://abhfhsnkwdjoixukwsju.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiaGZoc25rd2Rqb2l4dWt3c2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzkxMTYsImV4cCI6MjA4ODc1NTExNn0.LUHW6BsmH8i4oKEfvJoCIRNhFn6Vj2EosjcrVQZTVfg';
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const params = new URLSearchParams(window.location.search);
+    const MERCHANT_ID = params.get('id');
+
+    let merchantName = '';
+
+    // ── Utilities ─────────────────────────────────────
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function resolveImg(url) {
+      if (!url) return '';
+      url = url.trim();
+      if (url.includes('lh3.googleusercontent.com')) return url;
+      let m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (m) return 'https://lh3.googleusercontent.com/d/' + m[1] + '=s600';
+      m = url.match(/drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m) return 'https://lh3.googleusercontent.com/d/' + m[1] + '=s600';
+      m = url.match(/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)/);
+      if (m) return 'https://lh3.googleusercontent.com/d/' + m[1] + '=s600';
+      if (url.includes('squarespace-cdn.com')) return url + '?format=500w';
+      return url;
+    }
+
+    let _toastTimer = null;
+    function showToast(msg, isError = false) {
+      const el = document.getElementById('sf-toast');
+      el.textContent = msg;
+      el.className = 'sf-toast' + (isError ? ' sf-toast-error' : '') + ' sf-show';
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => el.classList.remove('sf-show'), 3500);
+    }
+
+    function fmt(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    // ── Confirmation input validation ──────────────────
+    function onConfirmInput() {
+      const inp = document.getElementById('inp-confirm');
+      const btn = document.getElementById('btn-delete');
+      const isMatch = inp.value.trim().toLowerCase() === merchantName.toLowerCase();
+      btn.disabled = !isMatch;
+      inp.classList.toggle('sf-invalid', inp.value.trim() !== '' && !isMatch);
+    }
+
+    // ── Delete ─────────────────────────────────────────
+    async function deleteMerchant() {
+      const btn = document.getElementById('btn-delete');
+      btn.disabled = true;
+      btn.textContent = 'Menghapus...';
+
+      try {
+        // Delete related records first
+        const [supDel, keuDel, photoDel] = await Promise.all([
+          client.from('franchise_support_merchant').delete().eq('merchant_id', MERCHANT_ID),
+          client.from('franchise_keunggulan_merchant').delete().eq('merchant_id', MERCHANT_ID),
+          client.from('franchise_image_outlet').delete().eq('merchant_id', MERCHANT_ID),
+        ]);
+
+        if (supDel.error) throw supDel.error;
+        if (keuDel.error) throw keuDel.error;
+        if (photoDel.error) throw photoDel.error;
+
+        // Delete the merchant itself
+        const { error } = await client.from('franchise_merchant').delete().eq('id', MERCHANT_ID);
+        if (error) throw error;
+
+        document.getElementById('sf-content').style.display = 'none';
+        document.getElementById('sf-deleted-msg').textContent =
+          `"${merchantName}" telah dihapus secara permanen dari sistem.`;
+        document.getElementById('sf-deleted').style.display = 'block';
+
+      } catch (err) {
+        showToast('Gagal menghapus: ' + err.message, true);
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+          Hapus Merchant`;
+      }
+    }
+
+    function goToDashboard() {
+      const base = window.location.pathname.replace('merchant-delete', '');
+      window.location.href = base + 'merchant-dashboard';
+    }
+
+    // ── Bootstrap ──────────────────────────────────────
+    async function init() {
+      if (!MERCHANT_ID) {
+        document.getElementById('sf-loading').style.display = 'none';
+        document.getElementById('sf-error').style.display = 'block';
+        document.getElementById('sf-error-msg').textContent = 'Parameter ?id= tidak ditemukan di URL.';
+        return;
+      }
+
+      const [mRes, supRes, keuRes, photoRes] = await Promise.all([
+        client.from('franchise_merchant').select('id, nama, harga, thumbnail, category_id, created_at').eq('id', MERCHANT_ID).single(),
+        client.from('franchise_support_merchant').select('id', { count: 'exact', head: true }).eq('merchant_id', MERCHANT_ID),
+        client.from('franchise_keunggulan_merchant').select('id', { count: 'exact', head: true }).eq('merchant_id', MERCHANT_ID),
+        client.from('franchise_image_outlet').select('id', { count: 'exact', head: true }).eq('merchant_id', MERCHANT_ID),
+      ]);
+
+      if (mRes.error || !mRes.data) {
+        document.getElementById('sf-loading').style.display = 'none';
+        document.getElementById('sf-error').style.display = 'block';
+        if (mRes.error) document.getElementById('sf-error-msg').textContent = mRes.error.message;
+        return;
+      }
+
+      const m = mRes.data;
+      merchantName = m.nama || '';
+
+      // Header
+      document.getElementById('sf-hdr-name').textContent = m.nama || 'Merchant';
+      document.title = `Hapus — ${m.nama || 'Merchant'}`;
+
+      // Thumbnail
+      if (m.thumbnail) {
+        const resolved = resolveImg(m.thumbnail);
+        document.getElementById('sf-thumb-box').innerHTML =
+          `<img src="${esc(resolved)}" alt="Thumbnail" onerror="this.style.opacity='0.3'" />`;
+      }
+
+      // Merchant info
+      document.getElementById('sf-merchant-name').textContent = m.nama || '—';
+      const metaParts = [];
+      if (m.harga) metaParts.push(fmt(m.harga));
+      if (m.created_at) {
+        const d = new Date(m.created_at);
+        metaParts.push('Dibuat ' + d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }));
+      }
+      document.getElementById('sf-merchant-meta').textContent = metaParts.join(' · ') || 'Tidak ada keterangan';
+
+      // Stats
+      document.getElementById('stat-support').textContent = supRes.count ?? 0;
+      document.getElementById('stat-keunggulan').textContent = keuRes.count ?? 0;
+      document.getElementById('stat-photos').textContent = photoRes.count ?? 0;
+
+      // Confirmation hint
+      document.getElementById('sf-confirm-name-hint').textContent = m.nama || '—';
+
+      document.getElementById('sf-loading').style.display = 'none';
+      document.getElementById('sf-content').style.display = 'block';
+    }
+
+    // ── Squarespace full-width breakout ───────────────
+    (function breakOutOfSquarespace() {
+      function fit() {
+        var el = document.querySelector('.sf-layout');
+        if (!el) return;
+        el.style.removeProperty('width');
+        el.style.removeProperty('margin-left');
+        var left = el.getBoundingClientRect().left;
+        el.style.setProperty('width', window.innerWidth + 'px', 'important');
+        el.style.setProperty('margin-left', (-left) + 'px', 'important');
+        el.style.setProperty('max-width', 'none', 'important');
+        el.style.setProperty('box-sizing', 'border-box', 'important');
+        el.style.setProperty('display', 'block', 'important');
+      }
+      requestAnimationFrame(function () {
+        fit();
+        window.addEventListener('load', fit);
+        window.addEventListener('resize', fit);
+      });
+    })();
+
+    init();
+  </script>
