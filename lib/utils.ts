@@ -38,3 +38,10 @@ export function resolveImg(url: string | null | undefined): string {
 
   return url
 }
+
+export function getYoutubeEmbedUrl(url: string | null | undefined): string | null {
+  if (!url) return null
+  let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  if (m) return 'https://www.youtube.com/embed/' + m[1]
+  return null
+}
