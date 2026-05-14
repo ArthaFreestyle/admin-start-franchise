@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Toast from '@/app/components/Toast'
+import RichTextEditor from '@/app/components/RichTextEditor'
 import { resolveImg } from '@/lib/utils'
 
 const BUCKET = 'Start Franchise Bucket'
@@ -19,13 +20,11 @@ function MerchantEditContent() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [authed, setAuthed] = useState(false)
 
-  // Reference data
   const [categories, setCategories] = useState<any[]>([])
   const [systems, setSystems] = useState<any[]>([])
   const [models, setModels] = useState<any[]>([])
   const [types, setTypes] = useState<any[]>([])
 
-  // Main Form Data
   const [formData, setFormData] = useState({
     nama: '',
     harga: '',
@@ -34,12 +33,12 @@ function MerchantEditContent() {
     luas_bangunan_min: '',
     bep: '',
     badan_usaha: '',
-    id_kategori: '',
-    id_system: '',
-    id_model: '',
-    id_type_outlet: '',
+    category_id: '',
+    system_id: '',
+    model_id: '',
+    outlet_type_id: '',
     video_url: '',
-    deskripsi: '',
+    deskripsi_merchant: '',
     is_verified: false,
     is_recommend: false,
     thumbnail: '',
@@ -47,16 +46,13 @@ function MerchantEditContent() {
     data_confirmed_at: null as string | null
   })
 
-  // Relations
   const [support, setSupport] = useState<any[]>([])
   const [keunggulan, setKeunggulan] = useState<any[]>([])
   const [photos, setPhotos] = useState<any[]>([])
 
-  // Inputs
   const [newSupport, setNewSupport] = useState('')
   const [newKeunggulan, setNewKeunggulan] = useState('')
 
-  // Upload States
   const [uploadingThumb, setUploadingThumb] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [uploadingPhotos, setUploadingPhotos] = useState(false)
@@ -65,7 +61,6 @@ function MerchantEditContent() {
   const logoInputRef = useRef<HTMLInputElement>(null)
   const photosInputRef = useRef<HTMLInputElement>(null)
 
-  // Auth guard
   useEffect(() => {
     if (!sessionStorage.getItem('sf_user')) {
       window.location.replace('/login')
@@ -122,12 +117,12 @@ function MerchantEditContent() {
       luas_bangunan_min: m.luas_bangunan_min || '',
       bep: m.bep || '',
       badan_usaha: m.badan_usaha || '',
-      id_kategori: m.id_kategori || '',
-      id_system: m.id_system || '',
-      id_model: m.id_model || '',
-      id_type_outlet: m.id_type_outlet || '',
+      category_id: m.category_id || '',
+      system_id: m.system_id || '',
+      model_id: m.model_id || '',
+      outlet_type_id: m.outlet_type_id || '',
       video_url: m.video_url || '',
-      deskripsi: m.deskripsi || '',
+      deskripsi_merchant: m.deskripsi_merchant || '',
       is_verified: !!m.is_verified,
       is_recommend: !!m.is_recommend,
       thumbnail: m.thumbnail || '',
@@ -138,7 +133,6 @@ function MerchantEditContent() {
     setSupport(m.franchise_support_merchant || [])
     setKeunggulan(m.franchise_keunggulan_merchant || [])
     setPhotos(m.franchise_image_outlet || [])
-
     setLoading(false)
   }, [id])
 
@@ -150,7 +144,6 @@ function MerchantEditContent() {
     setToast({ message, type: isError ? 'error' : 'success' })
   }
 
-  // --- Handlers ---
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target as any
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined
@@ -174,11 +167,11 @@ function MerchantEditContent() {
       luas_bangunan_min: formData.luas_bangunan_min || null,
       bep: formData.bep || null,
       badan_usaha: formData.badan_usaha || null,
-      id_kategori: formData.id_kategori || null,
-      id_system: formData.id_system || null,
-      id_model: formData.id_model || null,
-      id_type_outlet: formData.id_type_outlet || null,
-      deskripsi: formData.deskripsi || null,
+      category_id: formData.category_id || null,
+      system_id: formData.system_id || null,
+      model_id: formData.model_id || null,
+      outlet_type_id: formData.outlet_type_id || null,
+      deskripsi_merchant: formData.deskripsi_merchant || null,
       video_url: formData.video_url || null,
       is_verified: formData.is_verified,
       is_recommend: formData.is_recommend,
@@ -208,7 +201,6 @@ function MerchantEditContent() {
     }
   }
 
-  // --- Storage ---
   const sanitizeFilename = (name: string) => name.replace(/[^a-zA-Z0-9._-]/g, '_')
 
   const uploadToStorage = async (file: File, path: string) => {
@@ -250,7 +242,7 @@ function MerchantEditContent() {
     showToast(`Mengupload ${imageFiles.length} foto...`)
 
     let newPhotos: any[] = []
-    
+
     for (const file of imageFiles) {
       try {
         const url = await uploadToStorage(file, 'outlet_photos')
@@ -281,12 +273,11 @@ function MerchantEditContent() {
     }
   }
 
-  // --- Relations ---
   const addSupport = async () => {
     if (!newSupport.trim()) return
     const payload = { merchant_id: parseInt(id!), nama: newSupport.trim() }
     const { data, error } = await supabase.from('franchise_support_merchant').insert(payload).select('id, nama').single()
-    
+
     if (error) showToast(error.message, true)
     else {
       setSupport(prev => [...prev, data])
@@ -304,7 +295,7 @@ function MerchantEditContent() {
     if (!newKeunggulan.trim()) return
     const payload = { merchant_id: parseInt(id!), nama: newKeunggulan.trim() }
     const { data, error } = await supabase.from('franchise_keunggulan_merchant').insert(payload).select('id, nama').single()
-    
+
     if (error) showToast(error.message, true)
     else {
       setKeunggulan(prev => [...prev, data])
@@ -347,7 +338,7 @@ function MerchantEditContent() {
       <div className="sf-page-header" style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: 'none' }}>
         <div className="sf-page-header-left">
           <div>
-            <h1>Edit Merchant</h1>
+            <h1 style={{ fontSize: '22px' }}>Edit Merchant</h1>
             <p className="sf-page-meta">ID: {id} &nbsp;·&nbsp; Edit profil dan data {formData.nama}</p>
           </div>
         </div>
@@ -364,7 +355,7 @@ function MerchantEditContent() {
 
       {formData.data_confirmed_at && (
         <div className="sf-confirmed-badge" style={{ marginBottom: '20px' }}>
-          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <polyline points="20 6 9 17 4 12" />
           </svg>
           Data telah dikonfirmasi pada {new Date(formData.data_confirmed_at).toLocaleDateString('id-ID')}
@@ -372,7 +363,7 @@ function MerchantEditContent() {
       )}
 
       {/* Profil Utama */}
-      <section className="sf-section">
+      <section className="sf-section" style={{ marginBottom: '16px' }}>
         <div className="sf-section-header">
           <h3>Profil Utama</h3>
           <p>Informasi dasar dan klasifikasi merchant</p>
@@ -381,28 +372,28 @@ function MerchantEditContent() {
           <div className="sf-form-grid">
             <div className="sf-field sf-field-full">
               <label className="sf-label">Nama Merchant *</label>
-              <input className="sf-input" name="nama" value={formData.nama} onChange={handleInputChange} />
+              <input className="sf-input" name="nama" value={formData.nama} onChange={handleInputChange} placeholder="Nama brand franchise..." />
             </div>
 
             <div className="sf-field">
               <label className="sf-label">Harga (Rp)</label>
-              <input className="sf-input" type="number" name="harga" value={formData.harga} onChange={handleInputChange} />
+              <input className="sf-input" type="number" name="harga" value={formData.harga} onChange={handleInputChange} placeholder="0" />
             </div>
             <div className="sf-field">
               <label className="sf-label">Harga Coret (Rp)</label>
-              <input className="sf-input" type="number" name="harga_coret" value={formData.harga_coret} onChange={handleInputChange} />
+              <input className="sf-input" type="number" name="harga_coret" value={formData.harga_coret} onChange={handleInputChange} placeholder="0" />
             </div>
 
             <div className="sf-field">
               <label className="sf-label">Kategori</label>
-              <select className="sf-select" name="id_kategori" value={formData.id_kategori} onChange={handleInputChange}>
+              <select className="sf-select" name="category_id" value={formData.category_id} onChange={handleInputChange}>
                 <option value="">Pilih Kategori...</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
             <div className="sf-field">
               <label className="sf-label">Tipe Outlet</label>
-              <select className="sf-select" name="id_type_outlet" value={formData.id_type_outlet} onChange={handleInputChange}>
+              <select className="sf-select" name="outlet_type_id" value={formData.outlet_type_id} onChange={handleInputChange}>
                 <option value="">Pilih Tipe Outlet...</option>
                 {types.map(t => <option key={t.id} value={t.id}>{t.nama}</option>)}
               </select>
@@ -410,14 +401,14 @@ function MerchantEditContent() {
 
             <div className="sf-field">
               <label className="sf-label">Franchise System</label>
-              <select className="sf-select" name="id_system" value={formData.id_system} onChange={handleInputChange}>
+              <select className="sf-select" name="system_id" value={formData.system_id} onChange={handleInputChange}>
                 <option value="">Pilih System...</option>
                 {systems.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}
               </select>
             </div>
             <div className="sf-field">
               <label className="sf-label">Franchise Model</label>
-              <select className="sf-select" name="id_model" value={formData.id_model} onChange={handleInputChange}>
+              <select className="sf-select" name="model_id" value={formData.model_id} onChange={handleInputChange}>
                 <option value="">Pilih Model...</option>
                 {models.map(m => <option key={m.id} value={m.id}>{m.nama}</option>)}
               </select>
@@ -425,11 +416,11 @@ function MerchantEditContent() {
 
             <div className="sf-field">
               <label className="sf-label">Tahun Berdiri</label>
-              <input className="sf-input" type="number" name="tahun_berdiri" value={formData.tahun_berdiri} onChange={handleInputChange} />
+              <input className="sf-input" type="number" name="tahun_berdiri" value={formData.tahun_berdiri} onChange={handleInputChange} placeholder="2020" />
             </div>
             <div className="sf-field">
               <label className="sf-label">Luas Bangunan Min (m²)</label>
-              <input className="sf-input" type="number" name="luas_bangunan_min" value={formData.luas_bangunan_min} onChange={handleInputChange} />
+              <input className="sf-input" type="number" name="luas_bangunan_min" value={formData.luas_bangunan_min} onChange={handleInputChange} placeholder="15" />
             </div>
 
             <div className="sf-field">
@@ -447,8 +438,12 @@ function MerchantEditContent() {
             </div>
 
             <div className="sf-field sf-field-full">
-              <label className="sf-label">Deskripsi</label>
-              <textarea className="sf-textarea" name="deskripsi" value={formData.deskripsi} onChange={handleInputChange} placeholder="Deskripsi franchise..." />
+              <label className="sf-label">Deskripsi Merchant</label>
+              <RichTextEditor
+                value={formData.deskripsi_merchant}
+                onChange={(html) => setFormData(prev => ({ ...prev, deskripsi_merchant: html }))}
+                placeholder="Deskripsikan franchise ini..."
+              />
             </div>
 
             <div className="sf-field sf-field-full">
@@ -486,16 +481,16 @@ function MerchantEditContent() {
       </section>
 
       {/* Gambar */}
-      <section className="sf-section">
+      <section className="sf-section" style={{ marginBottom: '16px' }}>
         <div className="sf-section-header">
           <h3>Gambar Merchant</h3>
           <p>Thumbnail dan logo yang tampil di halaman listing</p>
         </div>
         <div className="sf-section-body">
-          <div className="sf-field" style={{ marginBottom: '22px' }}>
+          <div className="sf-field" style={{ marginBottom: '24px' }}>
             <label className="sf-label">Thumbnail</label>
             <div className="sf-img-row">
-              <div className="sf-img-box">
+              <div className="sf-img-box" style={{ width: '96px', height: '64px', borderRadius: '10px', flexShrink: 0 }}>
                 {formData.thumbnail ? (
                   <img src={resolveImg(formData.thumbnail)} alt="Thumbnail" />
                 ) : (
@@ -507,11 +502,11 @@ function MerchantEditContent() {
                 )}
               </div>
               <div className="sf-img-upload-area">
-                <input 
-                  type="file" 
-                  ref={thumbInputRef} 
-                  accept="image/*" 
-                  style={{ display: 'none' }} 
+                <input
+                  type="file"
+                  ref={thumbInputRef}
+                  accept="image/*"
+                  style={{ display: 'none' }}
                   onChange={(e) => {
                     if (e.target.files?.[0]) handleSingleImageUpload(e.target.files[0], 'thumbnail')
                   }}
@@ -522,9 +517,9 @@ function MerchantEditContent() {
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
-                  Upload Thumbnail
+                  {uploadingThumb ? 'Mengupload...' : 'Upload Thumbnail'}
                 </button>
-                {uploadingThumb && <span className="sf-upload-progress">Mengupload...</span>}
+                <span style={{ fontSize: '11.5px', color: '#9CA3AF' }}>Rekomendasi: 16:9, maks 2MB</span>
               </div>
             </div>
           </div>
@@ -532,7 +527,7 @@ function MerchantEditContent() {
           <div className="sf-field">
             <label className="sf-label">Logo</label>
             <div className="sf-img-row">
-              <div className="sf-img-box" style={{ borderRadius: '50%' }}>
+              <div className="sf-img-box" style={{ borderRadius: '50%', flexShrink: 0 }}>
                 {formData.logo ? (
                   <img src={resolveImg(formData.logo)} alt="Logo" />
                 ) : (
@@ -544,11 +539,11 @@ function MerchantEditContent() {
                 )}
               </div>
               <div className="sf-img-upload-area">
-                <input 
-                  type="file" 
-                  ref={logoInputRef} 
-                  accept="image/*" 
-                  style={{ display: 'none' }} 
+                <input
+                  type="file"
+                  ref={logoInputRef}
+                  accept="image/*"
+                  style={{ display: 'none' }}
                   onChange={(e) => {
                     if (e.target.files?.[0]) handleSingleImageUpload(e.target.files[0], 'logo')
                   }}
@@ -559,9 +554,9 @@ function MerchantEditContent() {
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
-                  Upload Logo
+                  {uploadingLogo ? 'Mengupload...' : 'Upload Logo'}
                 </button>
-                {uploadingLogo && <span className="sf-upload-progress">Mengupload...</span>}
+                <span style={{ fontSize: '11.5px', color: '#9CA3AF' }}>Rekomendasi: 1:1, maks 1MB</span>
               </div>
             </div>
           </div>
@@ -569,24 +564,24 @@ function MerchantEditContent() {
       </section>
 
       {/* Foto Outlet */}
-      <section className="sf-section">
+      <section className="sf-section" style={{ marginBottom: '16px' }}>
         <div className="sf-section-header">
           <h3>Foto Outlet</h3>
           <p>Galeri foto outlet yang ditampilkan ke calon franchisee</p>
         </div>
         <div className="sf-section-body">
-          <input 
-            type="file" 
-            ref={photosInputRef} 
-            accept="image/*" 
+          <input
+            type="file"
+            ref={photosInputRef}
+            accept="image/*"
             multiple
-            style={{ display: 'none' }} 
+            style={{ display: 'none' }}
             onChange={(e) => {
               if (e.target.files) handlePhotosUpload(e.target.files)
             }}
           />
-          <div 
-            className="sf-upload-zone" 
+          <div
+            className="sf-upload-zone"
             onClick={() => !uploadingPhotos && photosInputRef.current?.click()}
             style={uploadingPhotos ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >
@@ -597,37 +592,52 @@ function MerchantEditContent() {
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
-            <p><strong>Klik untuk upload</strong> atau drag &amp; drop</p>
+            <p><strong>{uploadingPhotos ? 'Sedang mengupload...' : 'Klik untuk upload'}</strong>{!uploadingPhotos && ' atau drag & drop'}</p>
             <small>PNG, JPG, WEBP — bisa pilih beberapa sekaligus</small>
           </div>
-          
-          <div className="sf-photo-grid">
-            {photos.map(p => {
-              const url = resolveImg(p.image_url || p.foto_url || p.url)
-              if (!url) return null
-              return (
-                <div className="sf-photo-item" key={p.id}>
-                  <img src={url} alt="Outlet" />
-                  <button className="sf-photo-del" onClick={() => deletePhoto(p.id)}>
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                </div>
-              )
-            })}
-          </div>
+
+          {photos.length > 0 && (
+            <div className="sf-photo-grid">
+              {photos.map(p => {
+                const url = resolveImg(p.image_url || p.foto_url || p.url)
+                if (!url) return null
+                return (
+                  <div className="sf-photo-item" key={p.id} style={{ position: 'relative' }}>
+                    <img src={url} alt="Outlet" />
+                    <button
+                      className="sf-photo-del"
+                      onClick={() => deletePhoto(p.id)}
+                      style={{
+                        position: 'absolute', top: '6px', right: '6px',
+                        width: '24px', height: '24px', borderRadius: '50%',
+                        background: 'rgba(255,59,48,0.9)', border: 'none',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: '#fff', flexShrink: 0
+                      }}
+                    >
+                      <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Support Merchant */}
-      <section className="sf-section">
+      <section className="sf-section" style={{ marginBottom: '16px' }}>
         <div className="sf-section-header">
           <h3>Support Merchant</h3>
           <p>Dukungan yang Anda berikan kepada setiap franchisee</p>
         </div>
         <div className="sf-section-body">
+          {support.length === 0 && (
+            <p style={{ fontSize: '14px', color: '#9CA3AF', fontStyle: 'italic', marginBottom: '12px' }}>Belum ada data support.</p>
+          )}
           {support.map(s => (
             <div className="sf-list-item" key={s.id}>
               <span className="sf-list-item-text">{s.nama || s.support || s.keterangan}</span>
@@ -640,26 +650,29 @@ function MerchantEditContent() {
             </div>
           ))}
           <div className="sf-add-row">
-            <input 
-              className="sf-input" 
-              type="text" 
-              placeholder="Contoh: Pelatihan awal 3 hari..." 
+            <input
+              className="sf-input"
+              type="text"
+              placeholder="Contoh: Pelatihan awal 3 hari..."
               value={newSupport}
               onChange={(e) => setNewSupport(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addSupport()}
             />
-            <button className="sf-btn-secondary" onClick={addSupport}>Tambah</button>
+            <button className="sf-btn sf-btn-primary" onClick={addSupport} style={{ whiteSpace: 'nowrap' }}>Tambah</button>
           </div>
         </div>
       </section>
 
       {/* Keunggulan */}
-      <section className="sf-section">
+      <section className="sf-section" style={{ marginBottom: '16px' }}>
         <div className="sf-section-header">
           <h3>Keunggulan Merchant</h3>
           <p>Poin-poin keunggulan franchise Anda dibanding kompetitor</p>
         </div>
         <div className="sf-section-body">
+          {keunggulan.length === 0 && (
+            <p style={{ fontSize: '14px', color: '#9CA3AF', fontStyle: 'italic', marginBottom: '12px' }}>Belum ada data keunggulan.</p>
+          )}
           {keunggulan.map(k => (
             <div className="sf-list-item" key={k.id}>
               <span className="sf-list-item-text">{k.nama || k.keunggulan || k.keterangan}</span>
@@ -672,21 +685,21 @@ function MerchantEditContent() {
             </div>
           ))}
           <div className="sf-add-row">
-            <input 
-              className="sf-input" 
-              type="text" 
-              placeholder="Contoh: BEP cepat, Brand kuat..." 
+            <input
+              className="sf-input"
+              type="text"
+              placeholder="Contoh: BEP cepat, Brand kuat..."
               value={newKeunggulan}
               onChange={(e) => setNewKeunggulan(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addKeunggulan()}
             />
-            <button className="sf-btn-secondary" onClick={addKeunggulan}>Tambah</button>
+            <button className="sf-btn sf-btn-primary" onClick={addKeunggulan} style={{ whiteSpace: 'nowrap' }}>Tambah</button>
           </div>
         </div>
       </section>
 
       {/* Konfirmasi Data */}
-      <section className="sf-section">
+      <section className="sf-section" style={{ marginBottom: '16px' }}>
         <div className="sf-section-header">
           <h3>Konfirmasi Data</h3>
           <p>Konfirmasikan bahwa data di atas sudah benar dan lengkap</p>

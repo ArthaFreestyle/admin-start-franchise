@@ -97,6 +97,31 @@ const relasiMerchantItems: NavItem[] = [
   },
 ]
 
+const analyticsItems: NavItem[] = [
+  {
+    href: '/analytics',
+    label: 'Analytics Likes',
+    icon: (
+      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path d="M21.21 15.89A10 10 0 118 2.83" />
+        <path d="M22 12A10 10 0 0012 2v10z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/analytics-visitors',
+    label: 'Analytics Visitors',
+    icon: (
+      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 00-3-3.87" />
+        <path d="M16 3.13a4 4 0 010 7.75" />
+      </svg>
+    ),
+  },
+]
+
 export default function Sidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -172,6 +197,22 @@ export default function Sidebar() {
           <div className="sf-nav-group">
             <div className="sf-nav-group-label">Relasi Merchant</div>
             {relasiMerchantItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sf-nav-item ${isActive(item.href) ? 'sf-nav-active' : ''}`}
+                onClick={close}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Analytics */}
+          <div className="sf-nav-group">
+            <div className="sf-nav-group-label">Analytics</div>
+            {analyticsItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

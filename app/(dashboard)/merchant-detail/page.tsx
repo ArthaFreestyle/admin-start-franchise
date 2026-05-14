@@ -250,7 +250,14 @@ function MerchantDetailContent() {
           <div className="sf-section">
             <div className="sf-section-title">Deskripsi &amp; Video</div>
             <div className="sf-section-body">
-              <div className="sf-desc">{m.deskripsi || <span className="sf-empty-list">Tidak ada deskripsi.</span>}</div>
+              {m.deskripsi_merchant ? (
+                <div
+                  className="sf-rich-content"
+                  dangerouslySetInnerHTML={{ __html: m.deskripsi_merchant }}
+                />
+              ) : (
+                <span className="sf-empty-list">Tidak ada deskripsi.</span>
+              )}
               
               {embedUrl && (
                 <div className="sf-video-wrap">
