@@ -21,13 +21,12 @@ interface AnalyticsLike {
   id: number
   created_at: string
   visitor_id: string
-  franchise_merchant: { nama: string } | null
-  website_visitors: {
-    email: string
-    full_name: string | null
-    whatsapp_number: string
-    country_code: string
-  } | null
+  merchant_id: number
+  merchant_name: string | null
+  user_email: string | null
+  user_full_name: string | null
+  user_whatsapp: string | null
+  total_count: number
 }
 
 interface MerchantOption {
@@ -219,26 +218,12 @@ export default function AnalyticsPage() {
     const from = (page - 1) * PAGE_SIZE
     const to = from + PAGE_SIZE - 1
 
-    let q = supabase
-      .from('likes')
-      .select(`
-        id, 
-        created_at, 
-        visitor_id,
-        franchise_merchant(nama),
-        website_visitors(email, full_name, whatsapp_number, country_code)
-      `, { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range(from, to)
-
-    if (query) {
-      q = q.ilike('visitor_id', `%${query}%`)
-    }
-    if (merchantId !== 'all') {
-      q = q.eq('merchant_id', parseInt(merchantId))
-    }
-
-    const { data, count, error: err } = await q
+    const { data, error: err } = await supabase.rpc('get_likes_with_users', {
+      p_merchant_id: merchantId !== 'all' ? parseInt(merchantId) : null,
+      p_search: query || null,
+      p_from_row: from,
+      p_to_row: to,
+    })
 
     if (err) {
       console.error('[Supabase error]', err)
@@ -249,8 +234,9 @@ export default function AnalyticsPage() {
       return
     }
 
-    setLikes((data as unknown as AnalyticsLike[]) || [])
-    setTotalCount(count || 0)
+    const rows = (data as AnalyticsLike[]) || []
+    setLikes(rows)
+    setTotalCount(rows[0]?.total_count ?? 0)
     setLoading(false)
   }, [])
 
@@ -317,7 +303,7 @@ export default function AnalyticsPage() {
             <input
               type="text"
               className="sf-search"
-              placeholder="Cari email visitor..."
+              placeholder="Cari nama atau email..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
             />
@@ -429,13 +415,11 @@ export default function AnalyticsPage() {
                 </tr>
               ) : (
                 likes.map((like) => {
-                  const product = like.franchise_merchant?.nama || 'Unknown Product'
-                  const visitor = like.website_visitors
-                  const name = visitor?.full_name || '-'
-                  const email = visitor?.email || like.visitor_id
-                  const wa = visitor?.whatsapp_number
-                  const cc = visitor?.country_code
-                  
+                  const product = like.merchant_name || 'Unknown Product'
+                  const name = like.user_full_name || '-'
+                  const email = like.user_email || like.visitor_id
+                  const wa = like.user_whatsapp
+
                   return (
                     <tr key={like.id}>
                       <td>
@@ -443,15 +427,15 @@ export default function AnalyticsPage() {
                       </td>
                       <td>{name}</td>
                       <td>{email}</td>
-                      <td>{wa ? `${cc || '62'}${wa.startsWith('0') ? wa.substring(1) : wa}` : '-'}</td>
+                      <td>{wa || '-'}</td>
                       <td style={{ whiteSpace: 'nowrap', color: 'var(--sf-text-muted)' }}>
                         {formatDate(like.created_at)}
                       </td>
                       <td>
                         <div className="sf-actions">
                           {wa ? (
-                            <a 
-                              href={getWaLink(wa, cc || '62')}
+                            <a
+                              href={getWaLink(wa, '')}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="sf-btn"
