@@ -53,8 +53,6 @@ function MerchantEditContent() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
-  const [authed, setAuthed] = useState(false)
-
   const [categories, setCategories] = useState<any[]>([])
   const [systems, setSystems] = useState<any[]>([])
   const [models, setModels] = useState<any[]>([])
@@ -99,14 +97,6 @@ function MerchantEditContent() {
   const thumbInputRef = useRef<HTMLInputElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
   const photosInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
 
   const loadReferenceData = async () => {
     const [catRes, sysRes, modRes, typRes, salesRes] = await Promise.all([
@@ -181,8 +171,8 @@ function MerchantEditContent() {
   }, [id])
 
   useEffect(() => {
-    if (authed) loadData()
-  }, [authed, loadData])
+    loadData()
+  }, [loadData])
 
   const showToast = (message: string, isError = false) => {
     setToast({ message, type: isError ? 'error' : 'success' })
@@ -357,8 +347,6 @@ function MerchantEditContent() {
     if (error) showToast(error.message, true)
     else setKeunggulan(prev => prev.filter(k => k.id !== keuId))
   }
-
-  if (!authed) return null
 
   if (loading) {
     return (

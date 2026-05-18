@@ -34,17 +34,6 @@ export default function FranchiseCategoriesPage() {
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  const [authed, setAuthed] = useState(false)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
-
   const loadCategories = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -66,10 +55,8 @@ export default function FranchiseCategoriesPage() {
   }, [])
 
   useEffect(() => {
-    if (authed) {
-      loadCategories()
-    }
-  }, [authed, loadCategories])
+    loadCategories()
+  }, [loadCategories])
 
   const handleSearch = (value: string) => {
     setSearchQuery(value)

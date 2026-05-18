@@ -14,17 +14,6 @@ function MerchantDetailContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [authed, setAuthed] = useState(false)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
-
   const loadDetail = useCallback(async () => {
     if (!id) {
       setError('ID Merchant tidak ditemukan di URL.')
@@ -67,12 +56,8 @@ function MerchantDetailContent() {
   }, [id])
 
   useEffect(() => {
-    if (authed) {
-      loadDetail()
-    }
-  }, [authed, loadDetail])
-
-  if (!authed) return null
+    loadDetail()
+  }, [loadDetail])
 
   if (loading) {
     return (

@@ -135,7 +135,6 @@ export default function Sidebar() {
   const handleLogout = useCallback(async () => {
     setLoggingOut(true)
     await supabase.auth.signOut()
-    sessionStorage.removeItem('sf_user')
     window.location.href = '/login'
   }, [])
 

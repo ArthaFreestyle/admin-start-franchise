@@ -21,16 +21,6 @@ function MerchantDeleteContent() {
   const [isDeleted, setIsDeleted] = useState(false)
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
-  const [authed, setAuthed] = useState(false)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
 
   const loadData = useCallback(async () => {
     if (!id) {
@@ -79,10 +69,8 @@ function MerchantDeleteContent() {
   }, [id])
 
   useEffect(() => {
-    if (authed) {
-      loadData()
-    }
-  }, [authed, loadData])
+    loadData()
+  }, [loadData])
 
   const handleDelete = async () => {
     if (!data) return
@@ -111,8 +99,6 @@ function MerchantDeleteContent() {
       setIsDeleting(false)
     }
   }
-
-  if (!authed) return null
 
   if (loading) {
     return (

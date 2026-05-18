@@ -52,17 +52,7 @@ export default function FranchiseImageOutletPage() {
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  const [authed, setAuthed] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
 
   const loadMerchants = useCallback(async () => {
     const { data } = await supabase
@@ -110,14 +100,11 @@ export default function FranchiseImageOutletPage() {
     setLoading(false)
   }, [])
 
-  // Initial load
   useEffect(() => {
-    if (authed) {
-      loadMerchants().then(() => {
-        loadItems(1, '')
-      })
-    }
-  }, [authed, loadMerchants, loadItems])
+    loadMerchants().then(() => {
+      loadItems(1, '')
+    })
+  }, [loadMerchants, loadItems])
 
   // Keydown for lightbox
   useEffect(() => {

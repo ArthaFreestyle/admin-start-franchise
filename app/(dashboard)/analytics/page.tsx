@@ -149,17 +149,7 @@ export default function AnalyticsPage() {
   const [topMerchantsData, setTopMerchantsData] = useState<{ name: string; likes: number }[]>([])
   const [likesOverTimeData, setLikesOverTimeData] = useState<{ date: string; likes: number }[]>([])
 
-  const [authed, setAuthed] = useState(false)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
 
   // ── Load Charts & Dropdown Data ──
   const loadChartData = useCallback(async (merchantId: string) => {
@@ -265,11 +255,9 @@ export default function AnalyticsPage() {
   }, [])
 
   useEffect(() => {
-    if (authed) {
-      loadChartData(selectedMerchantId)
-      loadLikes(1, searchQuery, selectedMerchantId)
-    }
-  }, [authed, selectedMerchantId, loadChartData, loadLikes]) // Removed searchQuery from dependency to avoid loop, handled in handleSearch
+    loadChartData(selectedMerchantId)
+    loadLikes(1, searchQuery, selectedMerchantId)
+  }, [selectedMerchantId, loadChartData, loadLikes]) // searchQuery excluded: changes handled in handleSearch
 
   const handleSearch = useCallback(
     (value: string) => {

@@ -1,4 +1,5 @@
 import Sidebar from '@/app/components/Sidebar'
+import AuthGuard from '@/app/components/AuthGuard'
 
 export default function DashboardLayout({
   children,
@@ -6,11 +7,13 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="sf-layout">
-      <Sidebar />
-      <div className="sf-main">
-        <div className="sf-wrapper">{children}</div>
+    <AuthGuard>
+      <div className="sf-layout">
+        <Sidebar />
+        <div className="sf-main">
+          <div className="sf-wrapper">{children}</div>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   )
 }

@@ -50,17 +50,6 @@ export default function FranchiseKeunggulanPage() {
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  const [authed, setAuthed] = useState(false)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
-
   const loadMerchants = useCallback(async () => {
     const { data } = await supabase
       .from('franchise_merchant')
@@ -108,14 +97,11 @@ export default function FranchiseKeunggulanPage() {
     setLoading(false)
   }, [])
 
-  // Initial load
   useEffect(() => {
-    if (authed) {
-      loadMerchants().then(() => {
-        loadItems(1, '', '')
-      })
-    }
-  }, [authed, loadMerchants, loadItems])
+    loadMerchants().then(() => {
+      loadItems(1, '', '')
+    })
+  }, [loadMerchants, loadItems])
 
   const handleSearch = (value: string) => {
     setSearchQuery(value)

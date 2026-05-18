@@ -34,17 +34,6 @@ export default function FranchiseModelPage() {
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  const [authed, setAuthed] = useState(false)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
-
   const loadItems = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -66,10 +55,8 @@ export default function FranchiseModelPage() {
   }, [])
 
   useEffect(() => {
-    if (authed) {
-      loadItems()
-    }
-  }, [authed, loadItems])
+    loadItems()
+  }, [loadItems])
 
   const handleSearch = (value: string) => {
     setSearchQuery(value)

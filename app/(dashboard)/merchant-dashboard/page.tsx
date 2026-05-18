@@ -172,17 +172,7 @@ export default function MerchantDashboardPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const [authed, setAuthed] = useState(false)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Auth guard — check sessionStorage, then load data
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
 
   const loadMerchants = useCallback(async (page: number, query: string) => {
     setLoading(true)
@@ -222,12 +212,9 @@ export default function MerchantDashboardPage() {
     setLoading(false)
   }, [])
 
-  // Only load data once authed
   useEffect(() => {
-    if (authed) {
-      loadMerchants(1, '')
-    }
-  }, [authed, loadMerchants])
+    loadMerchants(1, '')
+  }, [loadMerchants])
 
   const handleSearch = useCallback(
     (value: string) => {

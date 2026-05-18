@@ -25,16 +25,20 @@ export default function LoginPage() {
       return
     }
 
-    // Store user info in sessionStorage for backward compatibility
     if (data.user) {
-      sessionStorage.setItem(
-        'sf_user',
-        JSON.stringify({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.user_metadata?.name || data.user.email,
-        })
-      )
+      // Check role from public.profiles
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single()
+
+      if (profileError || !profile || profile.role !== 'admin') {
+        await supabase.auth.signOut()
+        setError('Akses ditolak. Hanya admin yang dapat masuk.')
+        setLoading(false)
+        return
+      }
     }
 
     // Redirect to dashboard

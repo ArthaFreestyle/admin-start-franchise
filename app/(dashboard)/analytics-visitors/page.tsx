@@ -172,17 +172,7 @@ export default function VisitorsAnalyticsPage() {
   const [todayVisitors, setTodayVisitors] = useState(0)
   const [thisWeekVisitors, setThisWeekVisitors] = useState(0)
 
-  const [authed, setAuthed] = useState(false)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Auth guard
-  useEffect(() => {
-    if (!sessionStorage.getItem('sf_user')) {
-      window.location.replace('/login')
-      return
-    }
-    setAuthed(true)
-  }, [])
 
   // ── Load Chart Data ──
   const loadChartData = useCallback(async () => {
@@ -267,11 +257,9 @@ export default function VisitorsAnalyticsPage() {
   }, [])
 
   useEffect(() => {
-    if (authed) {
-      loadChartData()
-      loadVisitors(1, searchQuery)
-    }
-  }, [authed, loadChartData, loadVisitors])
+    loadChartData()
+    loadVisitors(1, searchQuery)
+  }, [loadChartData, loadVisitors])
 
   const handleSearch = useCallback(
     (value: string) => {
