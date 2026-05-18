@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { formatIDR, formatDate, resolveImg } from '@/lib/utils'
 
@@ -57,26 +59,14 @@ function ThumbnailCell({ url }: { url: string | null }) {
   }
 
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="sf-thumb"
-        src={resolved}
-        alt="thumbnail"
-        loading="lazy"
-        onError={() => setFailed(true)}
-        style={failed ? { display: 'none' } : undefined}
-      />
-      {failed && (
-        <div className="sf-thumb-placeholder">
-          <svg width="20" height="20" fill="none" stroke="#D6ECFF" strokeWidth="2" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="3" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <polyline points="21 15 16 10 5 21" />
-          </svg>
-        </div>
-      )}
-    </>
+    <Image
+      className="sf-thumb"
+      src={resolved}
+      alt="thumbnail"
+      width={80}
+      height={52}
+      onError={() => setFailed(true)}
+    />
   )
 }
 
@@ -166,6 +156,7 @@ function Pagination({
 /* ── Main page component ───────────────────────────────────── */
 
 export default function MerchantDashboardPage() {
+  const router = useRouter()
   const [merchants, setMerchants] = useState<FranchiseMerchant[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -250,19 +241,28 @@ export default function MerchantDashboardPage() {
             Dashboard <span>Merchant</span>
           </h1>
         </div>
-        <div className="sf-search-wrap">
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            className="sf-search"
-            id="sf-search"
-            placeholder="Cari nama merchant..."
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="sf-search-wrap" style={{ margin: 0 }}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              className="sf-search"
+              id="sf-search"
+              placeholder="Cari nama merchant..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+          <button className="sf-btn sf-btn-primary" onClick={() => router.push('/merchant-create')} style={{ whiteSpace: 'nowrap' }}>
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Tambah Merchant
+          </button>
         </div>
       </div>
 
