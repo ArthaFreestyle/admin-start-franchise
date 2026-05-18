@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import Toast from '@/app/components/Toast'
 import DeleteModal from '@/app/components/DeleteModal'
@@ -440,11 +441,13 @@ export default function FranchiseImageOutletPage() {
                           <td colSpan={3}>
                             <div className="sf-edit-file-area">
                               {item.image_url && (
-                                <img 
-                                  className="sf-edit-current-thumb" 
-                                  src={item.image_url} 
-                                  alt="current" 
-                                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                                <Image
+                                  className="sf-edit-current-thumb"
+                                  src={item.image_url}
+                                  alt="current"
+                                  width={80}
+                                  height={60}
+                                  style={{ objectFit: 'cover' }}
                                 />
                               )}
                               <div>
@@ -493,17 +496,14 @@ export default function FranchiseImageOutletPage() {
                         <>
                           <td>
                             {item.image_url ? (
-                              <img 
-                                className="sf-thumb" 
-                                src={item.image_url} 
-                                alt="foto" 
-                                loading="lazy"
+                              <Image
+                                className="sf-thumb"
+                                src={item.image_url}
+                                alt="foto"
+                                width={80}
+                                height={52}
+                                style={{ objectFit: 'cover', cursor: 'pointer' }}
                                 onClick={() => setLightboxUrl(item.image_url)}
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none'
-                                  const next = e.currentTarget.nextElementSibling as HTMLElement
-                                  if (next) next.style.display = 'flex'
-                                }}
                               />
                             ) : null}
                             <div className="sf-thumb-placeholder" style={{ display: item.image_url ? 'none' : 'flex' }}>
@@ -635,7 +635,7 @@ export default function FranchiseImageOutletPage() {
                 {!isUploading && (
                   <button className="sf-file-remove" onClick={() => removeFile(i)} title="Hapus">&#10005;</button>
                 )}
-                <img className="sf-file-thumb" src={URL.createObjectURL(f)} alt={f.name} />
+                <Image className="sf-file-thumb" src={URL.createObjectURL(f)} alt={f.name} width={120} height={120} unoptimized style={{ objectFit: 'cover' }} />
                 <div className="sf-file-name">{f.name}</div>
               </div>
             ))}
@@ -696,7 +696,9 @@ export default function FranchiseImageOutletPage() {
       {lightboxUrl && (
         <div className="sf-lightbox sf-open" onClick={() => setLightboxUrl(null)}>
           <button className="sf-lightbox-close" onClick={() => setLightboxUrl(null)}>&#10005;</button>
-          <img src={lightboxUrl} alt="Preview foto outlet" onClick={(e) => e.stopPropagation()} />
+          <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh', minWidth: '320px', minHeight: '200px' }} onClick={(e) => e.stopPropagation()}>
+            <Image src={lightboxUrl} alt="Preview foto outlet" fill style={{ objectFit: 'contain' }} />
+          </div>
         </div>
       )}
     </>

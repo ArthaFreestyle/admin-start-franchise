@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import Toast from '@/app/components/Toast'
 import RichTextEditor from '@/app/components/RichTextEditor'
@@ -13,7 +14,7 @@ const BADAN_USAHA_OPTIONS = ['PT', 'CV']
 
 function convertToWebP(file: File, quality = 0.85): Promise<File> {
   return new Promise((resolve, reject) => {
-    const img = new Image()
+    const img = document.createElement('img')
     const objectUrl = URL.createObjectURL(file)
 
     img.onload = () => {
@@ -614,7 +615,7 @@ function MerchantEditContent() {
             <div className="sf-img-row">
               <div className="sf-img-box" style={{ width: '96px', height: '64px', borderRadius: '10px', flexShrink: 0 }}>
                 {formData.thumbnail ? (
-                  <img src={resolveImg(formData.thumbnail)} alt="Thumbnail" />
+                  <Image src={resolveImg(formData.thumbnail)!} alt="Thumbnail" width={96} height={64} style={{ objectFit: 'cover', borderRadius: '8px' }} />
                 ) : (
                   <svg width="26" height="26" fill="none" stroke="#C7C7CC" strokeWidth="1.5" viewBox="0 0 24 24">
                     <rect x="3" y="3" width="18" height="18" rx="3" />
@@ -651,7 +652,7 @@ function MerchantEditContent() {
             <div className="sf-img-row">
               <div className="sf-img-box" style={{ borderRadius: '50%', flexShrink: 0 }}>
                 {formData.logo ? (
-                  <img src={resolveImg(formData.logo)} alt="Logo" />
+                  <Image src={resolveImg(formData.logo)!} alt="Logo" width={64} height={64} style={{ objectFit: 'cover', borderRadius: '50%' }} />
                 ) : (
                   <svg width="26" height="26" fill="none" stroke="#C7C7CC" strokeWidth="1.5" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" />
@@ -724,8 +725,8 @@ function MerchantEditContent() {
                 const url = resolveImg(p.image_url || p.foto_url || p.url)
                 if (!url) return null
                 return (
-                  <div className="sf-photo-item" key={p.id} style={{ position: 'relative' }}>
-                    <img src={url} alt="Outlet" />
+                  <div className="sf-photo-item" key={p.id} style={{ position: 'relative', aspectRatio: '4/3' }}>
+                    <Image src={url} alt="Outlet" fill style={{ objectFit: 'cover' }} />
                     <button
                       className="sf-photo-del"
                       onClick={() => deletePhoto(p.id)}

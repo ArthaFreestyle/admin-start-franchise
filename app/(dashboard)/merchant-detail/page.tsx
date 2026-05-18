@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { formatIDR, formatDate, resolveImg, getYoutubeEmbedUrl } from '@/lib/utils'
 
@@ -98,7 +99,7 @@ function MerchantDetailContent() {
       <div className="sf-page-header">
         <div className="sf-page-header-left">
           <div className="sf-page-thumb">
-            {thumbSrc && <img src={thumbSrc} alt="Thumbnail" loading="lazy" />}
+            {thumbSrc && <Image src={thumbSrc} alt="Thumbnail" width={96} height={64} priority />}
           </div>
           <div>
             <h1>{m.nama}</h1>
@@ -268,8 +269,8 @@ function MerchantDetailContent() {
                   {photos.map((p: any) => {
                     const src = resolveImg(p.image_url)
                     return src ? (
-                      <div className="sf-photo-item" key={p.id}>
-                        <img src={src} alt="Foto outlet" loading="lazy" />
+                      <div className="sf-photo-item" key={p.id} style={{ position: 'relative', aspectRatio: '4/3' }}>
+                        <Image src={src} alt="Foto outlet" fill style={{ objectFit: 'cover' }} />
                       </div>
                     ) : null
                   })}
